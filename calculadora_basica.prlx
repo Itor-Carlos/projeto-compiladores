@@ -1,0 +1,80 @@
+This is program CalculadoraBasica.
+
+It presents:
+    alterable symbol Entrada;
+    alterable number Resultado, NumeroUm, NumeroDois;
+    alterable anwser Equal := no;
+
+Let us begin:
+    show("Digite um operador (+, -, *, /) ou = para sair:");
+    capture(Entrada);
+
+    as long as (Equal != yes) do [
+        show("Digite o primeiro e o segundo numero separados por um espaço: ");
+        capture(NumeroUm, NumeroDois)
+
+        just in case that (Entrada == '+') do [
+            Resultado := NumeroUm + NumeroDois;
+        ]
+        just in case that (Entrada == '-') do [
+            Resultado := NumeroUm - NumeroDois;
+        ]
+        just in case that (Entrada == '*') do [
+            Resultado := NumeroUm * NumeroDois;
+        ]
+        just in case that (Entrada == '/') do [
+            Resultado := NumeroUm / NumeroDois;
+        ]
+        just in case that (Entrada == '/') do [
+            Resultado := NumeroUm / NumeroDois;
+        ]
+        just in case that (Entrada == '//') do [
+            Resultado := NumeroUm//NumeroDois;
+        ]
+        otherwise do [
+            show("Operador invalido.");
+        ]
+    ]
+That would be all.
+
+
+
+
+
+
+This is program CalculadoraBasica.
+
+It presents:
+    alterable symbol Entrada;
+    alterable number Resultado, NumeroUm, NumeroDois;
+
+Let us begin:
+    show("Digite um operador (+, -, *, /) ou = para sair:");
+    capture(Entrada);
+
+    as long as (Entrada != '=') do [
+        show("Digite o primeiro e o segundo numero separados por um espaço: ");
+        capture(NumeroUm, NumeroDois)
+
+        just in case that (Entrada == '+') do [
+            Resultado := NumeroUm + NumeroDois;
+        ]
+        just in case that (Entrada == '-') do [
+            Resultado := NumeroUm - NumeroDois;
+        ]
+        just in case that (Entrada == '*') do [
+            Resultado := NumeroUm * NumeroDois;
+        ]
+        just in case that (Entrada == '/') do [
+            Resultado := NumeroUm / NumeroDois;
+        ]
+        otherwise do [
+            show("Operador invalido.");
+        ]
+
+        show("Resultado:", Resultado);
+
+        show("Digite outro operador (+, -, *, /) ou = para sair:");
+        capture(Entrada);
+    ]
+That would be all.
