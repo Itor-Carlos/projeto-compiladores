@@ -1,0 +1,24 @@
+This is program SelectionSort.
+
+It presents:
+    vector of number(1x5) listaNumeros;
+    alterable number I, J, MinIndex, Temp;
+
+Let us begin:
+
+    capture(listaNumeros);
+
+    considering I from 1 to 4 by 1 do [
+        MinIndex := I;
+        considering J from I + 1 to 5 by 1 do [
+            just in case that (listaNumeros(J) < listaNumeros(MinIndex)) do
+                MinIndex := J;
+        ];
+        Temp := listaNumeros(I);
+        listaNumeros(I) := listaNumeros(MinIndex);
+        listaNumeros(MinIndex) := Temp;
+    ];
+
+    show("Ordenado: ", listaNumeros);
+
+That would be all.
