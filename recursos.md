@@ -13,6 +13,7 @@
 
 ## Modificadores
 - `alterable`
+- `unalterable`
 
 ## Tipos Primitivos
 - `number`
@@ -45,6 +46,7 @@
 
 ## Operadores
 - Aritméticos: `+`, `-`, `*`, `/`, `//`
+- Relacionais: `<=`, `>=`
 - Relacionais: `==`, `!=`
 - Suporte a parênteses e precedência
 - Tipagem forte
@@ -57,14 +59,10 @@
 
 # Elementos Ainda Não Utilizados
 
-## Modificadores
-- `unalterable`
-
 ## Comandos
 - Interrupções:
-  - `abandon;`
   - `go to next iteration;`
 
 ## Operadores
-- Relacionais: `<`, `>`, `<=`, `>=`
+- Relacionais: `<`, `>`,
 - Booleanos: `and`, `or`, `!`, `xor`
