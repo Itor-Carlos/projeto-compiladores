@@ -66,3 +66,7 @@
 ## Operadores
 - Relacionais: `<`, `>`,
 - Booleanos: `and`, `or`, `!`, `xor`
+
+## Vetores
+- Multidimensionais (matrizes)
+- Vetores de `symbol` podem ser inicializados com strings
