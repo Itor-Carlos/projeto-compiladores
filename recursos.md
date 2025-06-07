@@ -46,7 +46,7 @@
 
 ## Operadores
 - Aritméticos: `+`, `-`, `*`, `/`, `//`
-- Relacionais: `<=`, `>=`, `<`
+- Relacionais: `<=`, `<`
 - Relacionais: `==`, `!=`
 - Suporte a parênteses e precedência
 - Tipagem forte
@@ -64,7 +64,7 @@
   - `go to next iteration;`
 
 ## Operadores
-- Relacionais: `>`,
+- Relacionais: `>`, `>=`
 - Booleanos: `and`, `or`, `!`, `xor`
 
 ## Vetores
