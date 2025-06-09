@@ -59,12 +59,9 @@
 
 # Elementos Ainda Não Utilizados
 
-## Comandos
-- Interrupções:
-  - `go to next iteration;`
 
 ## Operadores
-- Relacionais: `>`, `>=`
+- Relacionais: `>`
 - Booleanos: `and`, `or`, `!`, `xor`
 
 ## Vetores
