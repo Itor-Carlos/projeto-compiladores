@@ -46,8 +46,7 @@
 
 ## Operadores
 - Aritméticos: `+`, `-`, `*`, `/`, `//`
-- Relacionais: `<=`, `<`, `>`, `>=`
-- Relacionais: `==`, `!=`
+- Relacionais: `<=`, `<`, `>`, `>=`, `==`, `!=`
 - Booleanos: `and`, `or`, `!`, `xor`
 - Suporte a parênteses e precedência
 - Tipagem forte
