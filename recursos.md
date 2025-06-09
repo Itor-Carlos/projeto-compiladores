@@ -46,8 +46,9 @@
 
 ## Operadores
 - Aritméticos: `+`, `-`, `*`, `/`, `//`
-- Relacionais: `<=`, `<`
+- Relacionais: `<=`, `<`, `>`, `>=`
 - Relacionais: `==`, `!=`
+- Booleanos: `and`, `or`, `!`, `xor`
 - Suporte a parênteses e precedência
 - Tipagem forte
 
@@ -58,11 +59,6 @@
 ---
 
 # Elementos Ainda Não Utilizados
-
-
-## Operadores
-- Relacionais: `>`
-- Booleanos: `and`, `or`, `!`, `xor`
 
 ## Vetores
 - Multidimensionais (matrizes)
