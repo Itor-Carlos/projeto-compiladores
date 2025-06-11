@@ -15,7 +15,7 @@ Let us begin:
 
     considering Aux from 1 to Size by 1 do
     [
-        SortedList[Aux] := Aux;
+        SortedList(Aux) := Aux;
     ]
     
     Left := 1;
@@ -31,11 +31,11 @@ Let us begin:
     as long as (Left<=Right) do
     [
         Middle := (Left+Right)//2
-        just in case that (Key == SortedList[Middle]) do [
+        just in case that (Key == SortedList(Middle)) do [
             Index := Middle;
             abandon;
         ] otherwise do [
-            just in case that (Key<=SortedList[Middle]) do [
+            just in case that (Key<=SortedList(Middle)) do [
                 Right := Middle - 1;
             ] otherwise do [
                 Left := Middle + 1;
