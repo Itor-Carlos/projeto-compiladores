@@ -1,0 +1,69 @@
+This is program CalculadoraBasica.
+
+It presents:
+    alterable symbol Entrada;
+    alterable number Resultado, NumeroUm, NumeroDois;
+    alterable answer Equal := no, ExpressaoBooleano;
+    alterable vector of symbol(13) Materia := "Compiladores";
+
+Let us begin:
+    show("Digite um operador (+, -, *, /, //, >, and, or, xor) ou = para sair:");
+    capture(Entrada);
+
+    as long as (Equal != yes) do [
+        just in case that (Entrada == '=') do [
+            Equal := yes;
+            abandon;
+        ]
+
+        show("Digite o primeiro e o segundo numero desejados separados por um espaço:");
+        capture(NumeroUm, NumeroDois);
+
+        just in case that (Entrada == '+') do [
+            Resultado := NumeroUm + NumeroDois;
+            show("Resultado da soma:", Resultado);
+        ]
+        just in case that (Entrada == '-') do [
+            Resultado := NumeroUm - NumeroDois;
+            show("Resultado da subtração:", Resultado);
+        ]
+        just in case that (Entrada == '*') do [
+            Resultado := NumeroUm * NumeroDois;
+            show("Resultado da multiplicação:", Resultado);
+        ]
+        just in case that (Entrada == '/') do [
+            Resultado := NumeroUm / NumeroDois;
+            show("Resultado da divisão:", Resultado);
+        ]
+        just in case that (Entrada == '//') do [
+            Resultado := NumeroUm // NumeroDois;
+            show("Resultado da divisão inteira:", Resultado);
+        ]
+        just in case that (Entrada == '>') do [
+            ExpressaoBooleano := NumeroUm > NumeroDois;
+            show("Resultado:", ExpressaoBooleano);
+        ]
+        just in case that (Entrada == 'and') do [
+            ExpressaoBooleano := (NumeroUm >= 1) and (NumeroDois >= 1);
+            show("Resultado do and:", ExpressaoBooleano);
+        ]
+        just in case that (Entrada == 'or') do [
+            ExpressaoBooleano := (NumeroUm >= 1) or (NumeroDois >= 1);
+            show("Resultado do or:", ExpressaoBooleano);
+        ]
+        just in case that (Entrada == 'xor') do [
+            ExpressaoBooleano := (NumeroUm >= 1) xor (NumeroDois >= 1);
+            show("Resultado do xor:", ExpressaoBooleano);
+        ]
+        just in case that (Entrada == '!') do [
+            ExpressaoBooleano := !(NumeroUm >= NumeroDois);
+            show("Resultado do !:", ExpressaoBooleano);
+        ]
+        otherwise do [
+            show("O operador selecionado não existe, portanto, não é válido");
+        ]
+
+        show("Digite outro operador (+, -, *, /, //, >, and, or, xor, !) ou = para sair:");
+        capture(Entrada);
+    ]
+That would be all.

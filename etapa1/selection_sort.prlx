@@ -1,0 +1,45 @@
+This is program SelectionSort.
+{ Ordena cada linha de uma matriz utilizando o algoritmo Selection Sort }
+
+It presents:
+    vector of number(3x5) listaNumeros;
+    alterable number I, J, K, MinIndex, Temp;
+
+Let us begin:
+
+    considering I from 1 to 3 by 1 do [
+        considering J from 1 to 5 by 1 do [
+            capture(listaNumeros(I,J))
+        ];
+    ];
+
+    considering I from 1 to 3 by 1 do [
+        { Aplica o SelecitonSort na linha I}
+        considering J from 1 to 4 by 1 do [
+            MinIndex := J;
+
+            considering K from J + 1 to 5 by 1 do [
+                just in case that (listaNumeros(I,K) < listaNumeros(I,MinIndex)) do [
+                   MinIndex := K;
+                ];
+            ];
+
+            just in case that (MinIndex != J) do [
+                Temp := listaNumeros(I,J);
+                listaNumeros(I,J) := listaNumeros(I,MinIndex);
+                listaNumeros(I,MinIndex) = Temp;
+            ];
+            
+            just in case that (listaNumeros(J,I) >= listaNumeros(MinIndex, I)) do [
+                go to next iteration;
+            ];
+        ];
+    ];
+
+    considering I from 1 to 3 by 1 do [
+        considering J from 1 to 5 by 1 do [
+            show("Ordenado: ", listaNumeros(I,J));
+        ];
+    ];
+
+That would be all.
