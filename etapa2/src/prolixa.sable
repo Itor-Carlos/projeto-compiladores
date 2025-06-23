@@ -17,9 +17,12 @@ Tokens
  it_presents = 'It' ' ' 'presents';
  alterable = 'alterable';
  unalterable = 'unalterable';
- answer = 'yes' | 'no';
- symbol = letra_min | letra_masc;
- number = digito+ | digito+ ponto digito+;
+ just_in_case_that = 'just' ' ' 'in' ' ' 'case' ' ' 'that';
+ as_long_as = 'as' ' ' 'long' ' ' 'as';
+ considering_that = 'considering' ' ' 'that';
+ number = 'number';
+ answer = 'answer';
+ symbol = 'symbol';
  vazio = (espaco | rc | nl)+;
  identificador = letra_masc (letra_min | underline)*;
  vector = 'vector';
