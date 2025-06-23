@@ -27,6 +27,11 @@ Tokens
  identificador = letra_masc (letra_min | underline)*;
  vector = 'vector';
  of = 'of';
+ otherwise = 'otherwise';
+ go_to_next_iteration = 'go' ' ' 'to' ' ' 'next' ' ' 'iteration';
+ capture = 'capture';
+ show = 'show';
+ abandon = 'abandon';
 
 //operadores
  equal = '==';
