@@ -45,6 +45,10 @@ Tokens
  minus = '-';
  times = '*';
  divide = '/';
+ and = 'and';
+ or = 'or';
+ xor = 'xor';
+ not = '!';
     
     
 Ignored Tokens
