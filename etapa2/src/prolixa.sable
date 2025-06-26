@@ -13,9 +13,9 @@ Helpers
  
 Tokens
  this_is_program = 'This' ' ' 'is' ' ' 'program';
- let_us_begin = 'Let' ' ' 'us' ' ' 'begin' ':';
+ let_us_begin = 'Let' ' ' 'us' ' ' 'begin';
  that_would_be_all = 'That' ' ' 'would' ' ' 'be' ' ' 'all';
- it_presents = 'It' ' ' 'presents' ':';
+ it_presents = 'It' ' ' 'presents';
  alterable = 'alterable';
  unalterable = 'unalterable';
  just_in_case_that = 'just' ' ' 'in' ' ' 'case' ' ' 'that';
