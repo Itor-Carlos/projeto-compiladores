@@ -66,8 +66,9 @@ Tokens
  or = 'or';
  xor = 'xor';
  not = '!';
-    
-    
+ int_divide = '//';
+ 
+       
 Ignored Tokens
  vazio;
 
