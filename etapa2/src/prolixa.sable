@@ -12,7 +12,9 @@ Helpers
  underline = '_';
  
 Tokens
- this_is_program = 'This' ' ' 'is' ' ' 'program';
+ this = 'This';
+ is = 'is';
+ program = 'program';
  let_us_begin = 'Let' ' ' 'us' ' ' 'begin';
  that_would_be_all = 'That' ' ' 'would' ' ' 'be' ' ' 'all';
  it_presents = 'It' ' ' 'presents';
