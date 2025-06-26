@@ -1,0 +1,43 @@
+This is program SelectionSort
+
+It presents:
+    vector of number(3x5) Listanumeros;
+    alterable number I, J, K, MinIndex, Temp;
+
+Let us begin:
+
+    considering that I from 1 to 3 by 1 do [
+        considering that J from 1 to 5 by 1 do [
+            capture(Listanumeros(I,J))
+        ];
+    ];
+
+    considering that I from 1 to 3 by 1 do [
+        considering that J from 1 to 4 by 1 do [
+            MinIndex := J;
+
+            considering that K from J + 1 to 5 by 1 do [
+                just in case that (Listanumeros(I,K) < Listanumeros(I,MinIndex)) do [
+                   MinIndex := K;
+                ];
+            ];
+
+            just in case that (MinIndex != J) do [
+                Temp := Listanumeros(I,J);
+                Listanumeros(I,J) := Listanumeros(I,MinIndex);
+                Listanumeros(I,MinIndex) = Temp;
+            ];
+            
+            just in case that (Listanumeros(J,I) >= Listanumeros(MinIndex, I)) do [
+                go to next iteration;
+            ];
+        ];
+    ];
+
+    considering that I from 1 to 3 by 1 do [
+        considering that J from 1 to 5 by 1 do [
+            show("Ordenado: ", Listanumeros(I,J));
+        ];
+    ];
+
+That would be all.

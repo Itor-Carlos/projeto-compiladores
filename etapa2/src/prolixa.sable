@@ -4,6 +4,7 @@ Helpers
  letra_min = ['a'..'z'];
  letra_masc = ['A'..'Z'];
  digito = ['0' .. '9'];
+ any_char = [0 .. 0x0009]|[ 0x000B .. 0xFFFF];
  espaco = ' ';
  ponto = '.';
  rc = 13;
@@ -12,9 +13,9 @@ Helpers
  
 Tokens
  this_is_program = 'This' ' ' 'is' ' ' 'program';
- let_us_begin = 'Let' ' ' 'us' ' ' 'begin';
+ let_us_begin = 'Let' ' ' 'us' ' ' 'begin' ':';
  that_would_be_all = 'That' ' ' 'would' ' ' 'be' ' ' 'all';
- it_presents = 'It' ' ' 'presents';
+ it_presents = 'It' ' ' 'presents' ':';
  alterable = 'alterable';
  unalterable = 'unalterable';
  just_in_case_that = 'just' ' ' 'in' ' ' 'case' ' ' 'that';
@@ -24,17 +25,31 @@ Tokens
  answer = 'answer';
  symbol = 'symbol';
  vazio = (espaco | rc | nl)+;
- identificador = letra_masc (letra_min | underline)*;
+ identificador = letra_masc (letra_masc | letra_min | underline)*;
  vector = 'vector';
+ from = 'from';
+ to = 'to';
+ by = 'by';
+ do = 'do';
  of = 'of';
  otherwise = 'otherwise';
  go_to_next_iteration = 'go' ' ' 'to' ' ' 'next' ' ' 'iteration';
  capture = 'capture';
  show = 'show';
  abandon = 'abandon';
-
+ abre_parenteses = '(';
+ fecha_parenteses = ')';
+ abre_colchetes = '[';
+ fecha_colchetes = ']';
+ numero = (digito+ | digito+ '.' digito+);
+ intermedio_vetor = 'x';
+ ponto_virgula = ';';
+ virgula = ',';
+ string = '"' (any_char)* '"';
+ ponto_final = '.';
+ 
 //operadores
- equal = '==';
+ equal = '=';
  assign = ':=';
  not_equal = '!=';
  less_equal = '<=';
