@@ -50,9 +50,7 @@ Tokens
  string = '"' (any_char)* '"';
  ponto_final = '.';
  dois_pontos = ':';
- abre_comentario = '/' '*';
- fecha_comentario = '*' '/';
- comentario = abre_comentario (any_char | nl | rc)* fecha_comentario;
+ comentario = '{' (any_char | nl | rc)* '}';
 
  
 //operadores
