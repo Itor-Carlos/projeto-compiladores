@@ -4,7 +4,8 @@ Helpers
  letra_min = ['a'..'z'];
  letra_masc = ['A'..'Z'];
  digito = ['0' .. '9'];
- any_char = [0 .. 0x0009]|[ 0x000B .. 0xFFFF];
+ tab = 0x0009;
+ any_char = [0 .. 0x0009] | [0x000B .. 0xFFFF];
  espaco = ' ';
  ponto = '.';
  rc = 13;
@@ -26,7 +27,7 @@ Tokens
  number = 'number';
  answer = 'answer';
  symbol = 'symbol';
- vazio = (espaco | rc | nl)+;
+ vazio = (espaco | tab | rc | nl)+;
  identificador = letra_masc (letra_masc | letra_min | underline)*;
  vector = 'vector';
  from = 'from';
@@ -70,9 +71,6 @@ Tokens
  xor = 'xor';
  not = '!';
  int_divide = '//';
- 
-       
+
 Ignored Tokens
  comentario, vazio;
-
- 	
