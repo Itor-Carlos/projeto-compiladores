@@ -26,6 +26,7 @@ Tokens
  considering_that = 'considering' ' ' 'that';
  number = 'number';
  answer = 'answer';
+ answer_valores = ('yes' | 'no');
  symbol = 'symbol';
  vazio = (espaco | tab | rc | nl)+;
  identificador = letra_masc (letra_masc | letra_min | underline)*;
