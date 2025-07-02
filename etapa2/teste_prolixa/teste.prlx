@@ -1,44 +1,44 @@
-This is program SelectionSort
+This is program SelectionSort.
+{ Ordena cada linha de uma matriz utilizando o algoritmo Selection Sort }
 
 It presents:
-    vector of number(3x5) Listanumeros;
+    vector of number(3x5) ListaNumeros;
     alterable number I, J, K, MinIndex, Temp;
 
 Let us begin:
 
-	{this is a commentary}
-	
-    considering that I from 1 to 3 by 1 do [
-        considering that J from 1 to 5 by 1 do [
-            capture(Listanumeros(I,J))
+    considering I from 1 to 3 by 1 do [
+        considering J from 1 to 5 by 1 do [
+            capture(ListaNumeros(I,J))
         ];
     ];
 
-    considering that I from 1 to 3 by 1 do [
-        considering that J from 1 to 4 by 1 do [
+    considering I from 1 to 3 by 1 do [
+        { Aplica o SelecitonSort na linha I}
+        considering J from 1 to 4 by 1 do [
             MinIndex := J;
 
-            considering that K from J + 1 to 5 by 1 do [
-                just in case that (Listanumeros(I,K) < Listanumeros(I,MinIndex)) do [
+            considering K from J + 1 to 5 by 1 do [
+                just in case that (ListaNumeros(I,K) < ListaNumeros(I,MinIndex)) do [
                    MinIndex := K;
                 ];
             ];
 
             just in case that (MinIndex != J) do [
-                Temp := Listanumeros(I,J);
-                Listanumeros(I,J) := Listanumeros(I,MinIndex);
-                Listanumeros(I,MinIndex) = Temp;
+                Temp := ListaNumeros(I,J);
+                ListaNumeros(I,J) := ListaNumeros(I,MinIndex);
+                ListaNumeros(I,MinIndex) := Temp;
             ];
             
-            just in case that (Listanumeros(J,I) >= Listanumeros(MinIndex, I)) do [
+            just in case that (ListaNumeros(J,I) >= ListaNumeros(MinIndex, I)) do [
                 go to next iteration;
             ];
         ];
     ];
 
-    considering that I from 1 to 3 by 1 do [
-        considering that J from 1 to 5 by 1 do [
-            show("Ordenado: ", Listanumeros(I,J));
+    considering I from 1 to 3 by 1 do [
+        considering J from 1 to 5 by 1 do [
+            show("Ordenado: ", ListaNumeros(I,J));
         ];
     ];
 

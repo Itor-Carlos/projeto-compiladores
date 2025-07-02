@@ -6,7 +6,9 @@ Helpers
  digito = ['0' .. '9'];
  tab = 0x0009;
  any_char = [0 .. 0xffff];
- any_str = [0 .. 0xffff]-[0x27];
+ caracter_especial = [0 .. 0x21] | [0x23 .. 0x26] | 0x27 | [0x28 .. 0x2F] | [0x3A .. 0x40] | [0x5B .. 0x60] | [0x7B .. 0x7E];
+ caracter_especial_menos_aspas_simples = [0 .. 0x26] | [0x28 .. 0x2F] | [0x3A .. 0x40] | [0x5B .. 0x60] | [0x7B .. 0x7E];
+ any_char_menos_chave = [0 .. 0x7C] | [0x7E .. 0xFFFF];
  espaco = ' ';
  ponto = '.';
  rc = 13;
@@ -62,15 +64,16 @@ Tokens
  intermedio_vetor = 'x';
  ponto_virgula = ';';
  virgula = ',';
- string = '"' (any_str)* '"';
+ string = '"' (letra_masc | letra_min | caracter_especial | digito )* '"';
  ponto_final = '.';
  dois_pontos = ':';
- comentario = '{' (any_char | nl | rc)* '}';
+ comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
  barra_vertical = '|';
+ char = ''' caracter_especial_menos_aspas_simples ''';
 
- 
+
 //operadores
- equal = '=';
+ equal = '==';
  assign = ':=';
  not_equal = '!=';
  less_equal = '<=';
