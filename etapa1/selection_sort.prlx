@@ -2,7 +2,7 @@ This is program SelectionSort.
 { Ordena cada linha de uma matriz utilizando o algoritmo Selection Sort }
 
 It presents:
-    vector of number(3x5) listaNumeros;
+    vector of number(3x5) ListaNumeros;
     alterable number I, J, K, MinIndex, Temp;
 
 Let us begin:
@@ -19,18 +19,18 @@ Let us begin:
             MinIndex := J;
 
             considering K from J + 1 to 5 by 1 do [
-                just in case that (listaNumeros(I,K) < listaNumeros(I,MinIndex)) do [
+                just in case that (ListaNumeros(I,K) < ListaNumeros(I,MinIndex)) do [
                    MinIndex := K;
                 ];
             ];
 
             just in case that (MinIndex != J) do [
-                Temp := listaNumeros(I,J);
-                listaNumeros(I,J) := listaNumeros(I,MinIndex);
-                listaNumeros(I,MinIndex) = Temp;
+                Temp := ListaNumeros(I,J);
+                ListaNumeros(I,J) := ListaNumeros(I,MinIndex);
+                ListaNumeros(I,MinIndex) = Temp;
             ];
             
-            just in case that (listaNumeros(J,I) >= listaNumeros(MinIndex, I)) do [
+            just in case that (ListaNumeros(J,I) >= ListaNumeros(MinIndex, I)) do [
                 go to next iteration;
             ];
         ];
@@ -38,7 +38,7 @@ Let us begin:
 
     considering I from 1 to 3 by 1 do [
         considering J from 1 to 5 by 1 do [
-            show("Ordenado: ", listaNumeros(I,J));
+            show("Ordenado: ", ListaNumeros(I,J));
         ];
     ];
 
