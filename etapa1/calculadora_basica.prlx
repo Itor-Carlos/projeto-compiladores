@@ -16,51 +16,51 @@ Let us begin:
             abandon;
         ]
 
-        show("Digite o primeiro e o segundo numero desejados separados por um espaço:");
+        show("Digite o primeiro e o segundo numero desejados separados por um espaco:");
         capture(NumeroUm, NumeroDois);
 
-        just in case that (Entrada == '+') do [
+        just in case that (Entrada == "+") do [
             Resultado := NumeroUm + NumeroDois;
             show("Resultado da soma:", Resultado);
         ]
-        just in case that (Entrada == '-') do [
+        just in case that (Entrada == "-") do [
             Resultado := NumeroUm - NumeroDois;
-            show("Resultado da subtração:", Resultado);
+            show("Resultado da subtracao:", Resultado);
         ]
-        just in case that (Entrada == '*') do [
+        just in case that (Entrada == "*") do [
             Resultado := NumeroUm * NumeroDois;
-            show("Resultado da multiplicação:", Resultado);
+            show("Resultado da multiplicacao:", Resultado);
         ]
-        just in case that (Entrada == '/') do [
+        just in case that (Entrada == "/") do [
             Resultado := NumeroUm / NumeroDois;
-            show("Resultado da divisão:", Resultado);
+            show("Resultado da divisao:", Resultado);
         ]
-        just in case that (Entrada == '//') do [
+        just in case that (Entrada == "//") do [
             Resultado := NumeroUm // NumeroDois;
-            show("Resultado da divisão inteira:", Resultado);
+            show("Resultado da divisao inteira:", Resultado);
         ]
-        just in case that (Entrada == '>') do [
+        just in case that (Entrada == ">") do [
             ExpressaoBooleano := NumeroUm > NumeroDois;
             show("Resultado:", ExpressaoBooleano);
         ]
-        just in case that (Entrada == 'and') do [
+        just in case that (Entrada == "and") do [
             ExpressaoBooleano := (NumeroUm >= 1) and (NumeroDois >= 1);
             show("Resultado do and:", ExpressaoBooleano);
         ]
-        just in case that (Entrada == 'or') do [
+        just in case that (Entrada == "or") do [
             ExpressaoBooleano := (NumeroUm >= 1) or (NumeroDois >= 1);
             show("Resultado do or:", ExpressaoBooleano);
         ]
-        just in case that (Entrada == 'xor') do [
+        just in case that (Entrada == "xor") do [
             ExpressaoBooleano := (NumeroUm >= 1) xor (NumeroDois >= 1);
             show("Resultado do xor:", ExpressaoBooleano);
         ]
-        just in case that (Entrada == '!') do [
+        just in case that (Entrada == "!") do [
             ExpressaoBooleano := !(NumeroUm >= NumeroDois);
             show("Resultado do !:", ExpressaoBooleano);
         ]
         otherwise do [
-            show("O operador selecionado não existe, portanto, não é válido");
+            show("O operador selecionado nao existe, portanto, nao e valido");
         ]
 
         show("Digite outro operador (+, -, *, /, //, >, and, or, xor, !) ou = para sair:");

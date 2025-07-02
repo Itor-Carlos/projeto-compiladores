@@ -22,7 +22,7 @@ Let us begin:
     Right := Size;
 
     {Caso seja feita posteriormente, deve ser usado o operador “=”}
-    Not_Found = -1; 
+    Not_Found := -1; 
 
     Index := Not_Found;
     show("Digite o numero a ser encontrado");
@@ -44,9 +44,9 @@ Let us begin:
     ]
 
     just in case that (Index != Not_Found) do [
-        show("ELemento encontrado na posição: ", Index);
+        show("Elemento encontrado na posicao: ", Index);
     ] otherwise do [
-        show("ELemento não encontrado")
+        show("Elemento nao encontrado")
     ]
 
 That would be all.

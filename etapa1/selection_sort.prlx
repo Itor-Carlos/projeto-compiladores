@@ -9,7 +9,7 @@ Let us begin:
 
     considering I from 1 to 3 by 1 do [
         considering J from 1 to 5 by 1 do [
-            capture(listaNumeros(I,J))
+            capture(ListaNumeros(I,J))
         ];
     ];
 
@@ -27,7 +27,7 @@ Let us begin:
             just in case that (MinIndex != J) do [
                 Temp := ListaNumeros(I,J);
                 ListaNumeros(I,J) := ListaNumeros(I,MinIndex);
-                ListaNumeros(I,MinIndex) = Temp;
+                ListaNumeros(I,MinIndex) := Temp;
             ];
             
             just in case that (ListaNumeros(J,I) >= ListaNumeros(MinIndex, I)) do [
