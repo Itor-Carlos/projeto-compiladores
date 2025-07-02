@@ -5,7 +5,8 @@ Helpers
  letra_masc = ['A'..'Z'];
  digito = ['0' .. '9'];
  tab = 0x0009;
- any_char = [0 .. 0x0009] | [0x000B .. 0xFFFF];
+ any_char = [0 .. 0xffff];
+ any_str = [0 .. 0xffff]-[0x27];
  espaco = ' ';
  ponto = '.';
  rc = 13;
@@ -16,14 +17,24 @@ Tokens
  this = 'This';
  is = 'is';
  program = 'program';
- let_us_begin = 'Let' ' ' 'us' ' ' 'begin';
- that_would_be_all = 'That' ' ' 'would' ' ' 'be' ' ' 'all';
- it_presents = 'It' ' ' 'presents';
+ let = 'Let';
+ us = 'us';
+ begin = 'begin';
+ that_maiusculo = 'That';
+ would = 'would';
+ be = 'be';
+ all = 'all';
+ it = 'It';
+ presents = 'presents';
  alterable = 'alterable';
  unalterable = 'unalterable';
- just_in_case_that = 'just' ' ' 'in' ' ' 'case' ' ' 'that';
- as_long_as = 'as' ' ' 'long' ' ' 'as';
- considering_that = 'considering' ' ' 'that';
+ just = 'just';
+ in = 'in';
+ case = 'case';
+ that_minusculo = 'that';
+ as = 'as';
+ long = 'long';
+ considering = 'considering';
  number = 'number';
  answer = 'answer';
  answer_valores = ('yes' | 'no');
@@ -37,7 +48,9 @@ Tokens
  do = 'do';
  of = 'of';
  otherwise = 'otherwise';
- go_to_next_iteration = 'go' ' ' 'to' ' ' 'next' ' ' 'iteration';
+ go = 'go';
+ next = 'next';
+ iteration = 'iteration';
  capture = 'capture';
  show = 'show';
  abandon = 'abandon';
@@ -49,10 +62,11 @@ Tokens
  intermedio_vetor = 'x';
  ponto_virgula = ';';
  virgula = ',';
- string = '"' (any_char)* '"';
+ string = '"' (any_str)* '"';
  ponto_final = '.';
  dois_pontos = ':';
  comentario = '{' (any_char | nl | rc)* '}';
+ barra_vertical = '|';
 
  
 //operadores
