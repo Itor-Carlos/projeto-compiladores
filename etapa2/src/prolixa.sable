@@ -69,12 +69,13 @@ Tokens
  dois_pontos = ':';
  comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
  barra_vertical = '|';
- char = ''' caracter_especial_menos_aspas_simples ''';
+ char = ''' (letra_min | letra_masc) ''';
 
 
 //operadores
  equal = '==';
  assign = ':=';
+ vinculacao = '=';
  not_equal = '!=';
  less_equal = '<=';
  greater_equal = '>=';
