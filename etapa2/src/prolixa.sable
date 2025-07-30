@@ -14,6 +14,8 @@ Helpers
  rc = 13;
  nl = 10;
  underline = '_';
+ single_quote = 39;
+ single_bar = 92;
  
 Tokens
  this = 'This';
@@ -69,7 +71,7 @@ Tokens
  dois_pontos = ':';
  comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
  barra_vertical = '|';
- char = ''' (letra_min | letra_masc) ''';
+ char = ''' (letra_min | letra_masc | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
 
 
 //operadores
