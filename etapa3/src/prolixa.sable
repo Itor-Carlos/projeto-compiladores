@@ -62,6 +62,8 @@ Tokens
  fecha_parenteses = ')';
  abre_colchetes = '[';
  fecha_colchetes = ']';
+ abre_chaves = '{';
+ fecha_chaves = '}';
  numero = (digito+ | digito+ '.' digito+);
  intermedio_vetor = 'x';
  ponto_virgula = ';';
@@ -98,7 +100,59 @@ Ignored Tokens
  
 Productions
 
+start = program_prod;
+
+// definição dos auxiliares
+intermedio_vetor_expressoes = intermedio_vetor exp;
+virgula_expressoes = virgula exp;
+variaveis_virgula = var virgula;
+expressoes_virgula = exp virgula;
+otherwise_do = otherwise do comando; 
+
+
+
+// produções
+program_prod = this is program identificador ponto_final declaracoes? comandos?;
+
+declaracoes =  it presents dois_pontos declaracao+;
+
+comandos = let us begin dois_pontos comando+ that_maiusculo would be all ponto_final;
+
+declaracao =
+    {variavel} alterable tipo identificador ponto_virgula
+  | {const_sem_valor} unalterable tipo identificador ponto_virgula
+  | {const_com_valor} unalterable tipo identificador vinculacao valor ponto_virgula
+  | {vetor} vector of tipo abre_parenteses exp intermedio_vetor_expressoes* fecha_parenteses identificador ponto_virgula;
+    
+tipo = {number} number | {answer} answer | {symbol} symbol;
+
+var = 
+	{identificador} identificador 
+	| {identificador_vetor} identificador abre_parenteses exp virgula_expressoes* fecha_parenteses;
+
+unalt = identificador;
+
+valor =
+    {char} char
+  | {answer} answer_valores
+  | {numero} numero
+  | {string} string;
+
+
+comando =
+    {atribuicao_var} var assign exp ponto_virgula
+  | {atribuicao_const} unalt vinculacao exp ponto_virgula
+  | {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
+  | {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
+  | {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando
+  | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando
+  | {abandon} abandon ponto_virgula
+  | {gotonext} go to next iteration ponto_virgula
+  | {bloco} bloco;
+
 exp = exp_xor;
+
+bloco = abre_colchetes declaracao* comando* fecha_colchetes;
 
 exp_xor = 
     {xor} exp_xor xor exp_or
@@ -113,12 +167,12 @@ exp_and =
   | {solo} exp_cmp;
 
 exp_cmp =
-    {eq} exp_cmp equal exp_termo
-  | {neq} exp_cmp not_equal exp_termo
-  | {lt} exp_cmp less exp_termo
-  | {lte} exp_cmp less_equal exp_termo
-  | {gt} exp_cmp greater exp_termo
-  | {gte} exp_cmp greater_equal exp_termo
+    {igualdade} exp_cmp equal exp_termo
+  | {desigualdade} exp_cmp not_equal exp_termo
+  | {menor} exp_cmp less exp_termo
+  | {menor_igual} exp_cmp less_equal exp_termo
+  | {maior} exp_cmp greater exp_termo
+  | {maior_igual} exp_cmp greater_equal exp_termo
   | {solo} exp_termo;
 
 exp_termo =
@@ -133,12 +187,12 @@ exp_fator =
   | {solo} exp_unario;
 
 exp_unario =
-    {neg} minus exp_unario
+    {negativo} minus exp_unario
   | {not} not exp_unario
   | {solo} exp_primario;
 
 exp_primario =
     {numero} numero
   | {ident} identificador
-  | {par} abre_parenteses exp fecha_parenteses;
+  | {parenteses} abre_parenteses exp fecha_parenteses;
 
