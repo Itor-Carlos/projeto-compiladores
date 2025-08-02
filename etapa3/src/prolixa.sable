@@ -109,6 +109,8 @@ variaveis_virgula = var virgula;
 expressoes_virgula = exp virgula;
 otherwise_do = otherwise do comando; 
 
+unalterable_valor = vinculacao valor;
+
 
 
 // produções
@@ -120,8 +122,7 @@ comandos = let us begin dois_pontos comando+ that_maiusculo would be all ponto_f
 
 declaracao =
     {variavel} alterable tipo identificador ponto_virgula
-  | {const_sem_valor} unalterable tipo identificador ponto_virgula
-  | {const_com_valor} unalterable tipo identificador vinculacao valor ponto_virgula
+  | {const} unalterable tipo identificador unalterable_valor? ponto_virgula
   | {vetor} vector of tipo abre_parenteses exp intermedio_vetor_expressoes* fecha_parenteses identificador ponto_virgula;
     
 tipo = {number} number | {answer} answer | {symbol} symbol;
@@ -133,11 +134,10 @@ var =
 unalt = identificador;
 
 valor =
-    {char} char
+    {symbol} char
   | {answer} answer_valores
   | {numero} numero
   | {string} string;
-
 
 comando =
     {atribuicao_var} var assign exp ponto_virgula
@@ -193,6 +193,10 @@ exp_unario =
 
 exp_primario =
     {numero} numero
-  | {ident} identificador
+  | {string} string
+  | {char} char
+  | {bool} answer_valores
+  | {var} var
   | {parenteses} abre_parenteses exp fecha_parenteses;
+
 
