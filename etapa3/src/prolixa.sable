@@ -139,13 +139,15 @@ valor =
   | {string} string;
 
 
+just_in_case_completo = just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral otherwise_do?;
+
 comando_geral =
     {atribuicao_var} var assign exp ponto_virgula
   | {atribuicao_const} unalt vinculacao exp ponto_virgula
   | {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
   | {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
   | {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
-  | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco ponto_virgula
+  | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco
   | {bloco} bloco;
 
   
@@ -158,7 +160,7 @@ comando_com_laco =
   | {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
   | {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
   | {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
-  | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco ponto_virgula
+  | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco
   | {abandon} abandon ponto_virgula
   | {gotonext} go to next iteration ponto_virgula
   | {bloco} bloco_com_laco;
