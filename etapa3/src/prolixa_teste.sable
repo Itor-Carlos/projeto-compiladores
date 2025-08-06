@@ -75,7 +75,6 @@ Tokens
  barra_vertical = '|';
  char = ''' (letra_min | letra_masc | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
 
-
 //operadores
  equal = '==';
  assign = ':=';
@@ -107,10 +106,11 @@ intermedio_vetor_expressoes = intermedio_vetor exp;
 virgula_expressoes = virgula exp;
 variaveis_virgula = var virgula;
 expressoes_virgula = exp virgula;
-otherwise_do = otherwise do comando_geral; 
 
 unalterable_valor = vinculacao valor;
 
+otherwise_do_geral = otherwise do comando_geral;
+otherwise_do_loop = otherwise do comando_com_laco;
 
 // produções
 program_prod = this is program identificador ponto_final declaracoes? comandos?;
@@ -138,8 +138,11 @@ valor =
   | {numero} numero
   | {string} string;
 
+just_in_case_completo =
+    just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral;
 
-just_in_case_completo = just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral otherwise_do;
+just_in_case_loop =
+    just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_com_laco;
 
 comando_base = 
 	  {atribuicao_var} var assign exp ponto_virgula
@@ -147,28 +150,30 @@ comando_base =
 	| {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
 	| {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
 	| {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
-	| {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco;
+	| {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco
+	| {just} just_in_case_completo;
 	
-
 comando_geral =
     comando_base
-  | {just} just_in_case_completo
   | {bloco} bloco;
 
-// permitir estrutura de repetição aninhada
-//fazer depois: tentar evitar repetição abaixo
 comando_com_laco =
-    comando_base
-  | {abandon} abandon ponto_virgula
-  | {gotonext} go to next iteration ponto_virgula
-  | {bloco} bloco_com_laco;
+      {atribuicao_var} var assign exp ponto_virgula
+    | {atribuicao_const} unalt vinculacao exp ponto_virgula
+    | {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
+    | {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
+    | {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
+    | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco
+    | {just} just_in_case_loop
+    | {abandon} abandon ponto_virgula
+    | {gotonext} go to next iteration ponto_virgula
+    | {bloco} bloco_com_laco;
 
 bloco = abre_colchetes declaracao* comando_geral* fecha_colchetes;
 
 bloco_com_laco = abre_colchetes declaracao* comando_com_laco* fecha_colchetes;
 
 exp = exp_xor;
-
 
 exp_xor = 
     {xor} exp_xor xor exp_or
@@ -214,4 +219,3 @@ exp_primario =
   | {bool} answer_valores
   | {var} var
   | {parenteses} abre_parenteses exp fecha_parenteses;
-
