@@ -1,0 +1,217 @@
+Package prolixa;
+
+Helpers	
+ letra_min = ['a'..'z'];
+ letra_masc = ['A'..'Z'];
+ digito = ['0' .. '9'];
+ tab = 0x0009;
+ any_char = [0 .. 0xffff];
+ caracter_especial = [0 .. 0x21] | [0x23 .. 0x26] | 0x27 | [0x28 .. 0x2F] | [0x3A .. 0x40] | [0x5B .. 0x60] | [0x7B .. 0x7E] | [0x80 .. 0xEF];
+ caracter_especial_menos_aspas_simples = [0 .. 0x26] | [0x28 .. 0x2F] | [0x3A .. 0x40] | [0x5B .. 0x60] | [0x7B .. 0x7E];
+ any_char_menos_chave = [0 .. 0x7C] | [0x7E .. 0xFFFF];
+ espaco = ' ';
+ ponto = '.';
+ rc = 13;
+ nl = 10;
+ underline = '_';
+ single_quote = 39;
+ single_bar = 92;
+ 
+Tokens
+ this = 'This';
+ is = 'is';
+ program = 'program';
+ let = 'Let';
+ us = 'us';
+ begin = 'begin';
+ that_maiusculo = 'That';
+ would = 'would';
+ be = 'be';
+ all = 'all';
+ it = 'It';
+ presents = 'presents';
+ alterable = 'alterable';
+ unalterable = 'unalterable';
+ just = 'just';
+ in = 'in';
+ case = 'case';
+ that_minusculo = 'that';
+ as = 'as';
+ long = 'long';
+ considering = 'considering';
+ number = 'number';
+ answer = 'answer';
+ answer_valores = ('yes' | 'no');
+ symbol = 'symbol';
+ vazio = (espaco | tab | rc | nl)+;
+ identificador = letra_masc (letra_masc | letra_min | underline)*;
+ vector = 'vector';
+ from = 'from';
+ to = 'to';
+ by = 'by';
+ do = 'do';
+ of = 'of';
+ otherwise = 'otherwise';
+ go = 'go';
+ next = 'next';
+ iteration = 'iteration';
+ capture = 'capture';
+ show = 'show';
+ abandon = 'abandon';
+ abre_parenteses = '(';
+ fecha_parenteses = ')';
+ abre_colchetes = '[';
+ fecha_colchetes = ']';
+ abre_chaves = '{';
+ fecha_chaves = '}';
+ numero = (digito+ | digito+ '.' digito+);
+ intermedio_vetor = 'x';
+ ponto_virgula = ';';
+ virgula = ',';
+ string = '"' (letra_masc | letra_min | caracter_especial | digito )* '"';
+ ponto_final = '.';
+ dois_pontos = ':';
+ comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
+ barra_vertical = '|';
+ char = ''' (letra_min | letra_masc | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
+
+
+//operadores
+ equal = '==';
+ assign = ':=';
+ vinculacao = '=';
+ not_equal = '!=';
+ less_equal = '<=';
+ greater_equal = '>=';
+ less = '<';
+ greater = '>';
+ plus = '+';
+ minus = '-';
+ times = '*';
+ divide = '/';
+ and = 'and';
+ or = 'or';
+ xor = 'xor';
+ not = '!';
+ int_divide = '//';
+ 
+Ignored Tokens
+ comentario, vazio;
+ 
+Productions
+
+start = program_prod;
+
+// definição dos auxiliares
+intermedio_vetor_expressoes = intermedio_vetor exp;
+virgula_expressoes = virgula exp;
+variaveis_virgula = var virgula;
+expressoes_virgula = exp virgula;
+otherwise_do = otherwise do comando_geral; 
+
+unalterable_valor = vinculacao valor;
+
+
+// produções
+program_prod = this is program identificador ponto_final declaracoes? comandos?;
+
+declaracoes =  it presents dois_pontos declaracao+;
+
+comandos = let us begin dois_pontos comando_geral+ that_maiusculo would be all ponto_final;
+
+declaracao =
+    {variavel} alterable tipo identificador ponto_virgula
+  | {const} unalterable tipo identificador unalterable_valor? ponto_virgula
+  | {vetor} vector of tipo abre_parenteses exp intermedio_vetor_expressoes* fecha_parenteses identificador ponto_virgula;
+    
+tipo = {number} number | {answer} answer | {symbol} symbol;
+
+var = 
+	{identificador} identificador 
+	| {identificador_vetor} identificador abre_parenteses exp virgula_expressoes* fecha_parenteses;
+
+unalt = identificador;
+
+valor =
+    {symbol} char
+  | {answer} answer_valores
+  | {numero} numero
+  | {string} string;
+
+
+just_in_case_completo = just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral otherwise_do;
+
+comando_base = 
+	  {atribuicao_var} var assign exp ponto_virgula
+	| {atribuicao_const} unalt vinculacao exp ponto_virgula
+	| {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
+	| {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
+	| {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
+	| {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco;
+	
+
+comando_geral =
+    comando_base
+  | {just} just_in_case_completo
+  | {bloco} bloco;
+
+// permitir estrutura de repetição aninhada
+//fazer depois: tentar evitar repetição abaixo
+comando_com_laco =
+    comando_base
+  | {abandon} abandon ponto_virgula
+  | {gotonext} go to next iteration ponto_virgula
+  | {bloco} bloco_com_laco;
+
+bloco = abre_colchetes declaracao* comando_geral* fecha_colchetes;
+
+bloco_com_laco = abre_colchetes declaracao* comando_com_laco* fecha_colchetes;
+
+exp = exp_xor;
+
+
+exp_xor = 
+    {xor} exp_xor xor exp_or
+  | {solo} exp_or;
+
+exp_or = 
+    {or} exp_or or exp_and
+  | {solo} exp_and;
+
+exp_and = 
+    {and} exp_and and exp_cmp
+  | {solo} exp_cmp;
+
+exp_cmp =
+    {igualdade} exp_cmp equal exp_termo
+  | {desigualdade} exp_cmp not_equal exp_termo
+  | {menor} exp_cmp less exp_termo
+  | {menor_igual} exp_cmp less_equal exp_termo
+  | {maior} exp_cmp greater exp_termo
+  | {maior_igual} exp_cmp greater_equal exp_termo
+  | {solo} exp_termo;
+
+exp_termo =
+    {soma} exp_termo plus exp_fator
+  | {sub} exp_termo minus exp_fator
+  | {solo} exp_fator;
+
+exp_fator =
+    {mul} exp_fator times exp_unario
+  | {div} exp_fator divide exp_unario
+  | {div_int} exp_fator int_divide exp_unario
+  | {solo} exp_unario;
+
+exp_unario =
+    {negativo} minus exp_unario
+  | {not} not exp_unario
+  | {solo} exp_primario;
+
+exp_primario =
+    {numero} numero
+  | {string} string
+  | {char} char
+  | {bool} answer_valores
+  | {var} var
+  | {parenteses} abre_parenteses exp fecha_parenteses;
+
