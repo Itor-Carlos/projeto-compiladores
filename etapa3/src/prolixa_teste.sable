@@ -73,7 +73,7 @@ Tokens
  dois_pontos = ':';
  comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
  barra_vertical = '|';
- char = ''' (letra_min | letra_masc | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
+ char = ''' (letra_min | letra_masc | digito | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
 
 //operadores
  equal = '==';
@@ -139,7 +139,7 @@ valor =
   | {string} string;
 
 just_in_case_completo =
-    just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral;
+    {just_in_no_otherwise} just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral;
 
 just_in_case_loop =
     just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_com_laco;
