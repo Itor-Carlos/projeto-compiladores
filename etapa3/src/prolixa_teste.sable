@@ -16,6 +16,17 @@ Helpers
  underline = '_';
  single_quote = 39;
  single_bar = 92;
+ elementos_acento =  0xC0 | 0xC1 | 0xC2 | 0xC3 | 0xC4 | 0xC5 | 0xC7                                      
+  | 0xC8 | 0xC9 | 0xCA | 0xCB                 
+  | 0xCC | 0xCD | 0xCE | 0xCF                 
+  | 0xD2 | 0xD3 | 0xD4 | 0xD5 | 0xD6          
+  | 0xD9 | 0xDA | 0xDB | 0xDC                 
+  | 0xE0 | 0xE1 | 0xE2 | 0xE3 | 0xE4 | 0xE5   
+  | 0xE7                                      
+  | 0xE8 | 0xE9 | 0xEA | 0xEB                 
+  | 0xEC | 0xED | 0xEE | 0xEF                 
+  | 0xF2 | 0xF3 | 0xF4 | 0xF5 | 0xF6          
+  | 0xF9 | 0xFA | 0xFB | 0xFC; 
  
 Tokens
  this = 'This';
@@ -68,7 +79,7 @@ Tokens
  intermedio_vetor = 'x';
  ponto_virgula = ';';
  virgula = ',';
- string = '"' (letra_masc | letra_min | caracter_especial | digito )* '"';
+ string = '"' (letra_masc | letra_min | caracter_especial | digito | elementos_acento)* '"';
  ponto_final = '.';
  dois_pontos = ':';
  comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
