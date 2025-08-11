@@ -84,7 +84,7 @@ Tokens
  dois_pontos = ':';
  comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
  barra_vertical = '|';
- char = ''' (letra_min | letra_masc | digito | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
+ char = ''' (letra_min | caracter_especial_menos_aspas_simples | elementos_acento | letra_masc | digito | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
 
 //operadores
  equal = '==';
