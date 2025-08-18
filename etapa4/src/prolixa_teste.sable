@@ -1,0 +1,263 @@
+Package prolixa;
+
+Helpers	
+ letra_min = ['a'..'z'];
+ letra_masc = ['A'..'Z'];
+ digito = ['0' .. '9'];
+ tab = 0x0009;
+ any_char = [0 .. 0xffff];
+ caracter_especial = [0 .. 0x21] | [0x23 .. 0x26] | 0x27 | [0x28 .. 0x2F] | [0x3A .. 0x40] | [0x5B .. 0x60] | [0x7B .. 0x7E] | [0x80 .. 0xEF];
+ caracter_especial_menos_aspas_simples = [0 .. 0x26] | [0x28 .. 0x2F] | [0x3A .. 0x40] | [0x5B .. 0x60] | [0x7B .. 0x7E];
+ any_char_menos_chave = [0 .. 0x7C] | [0x7E .. 0xFFFF];
+ espaco = ' ';
+ ponto = '.';
+ rc = 13;
+ nl = 10;
+ underline = '_';
+ single_quote = 39;
+ single_bar = 92;
+ elementos_acento =  0xC0 | 0xC1 | 0xC2 | 0xC3 | 0xC4 | 0xC5 | 0xC7                                      
+  | 0xC8 | 0xC9 | 0xCA | 0xCB                 
+  | 0xCC | 0xCD | 0xCE | 0xCF                 
+  | 0xD2 | 0xD3 | 0xD4 | 0xD5 | 0xD6          
+  | 0xD9 | 0xDA | 0xDB | 0xDC                 
+  | 0xE0 | 0xE1 | 0xE2 | 0xE3 | 0xE4 | 0xE5   
+  | 0xE7                                      
+  | 0xE8 | 0xE9 | 0xEA | 0xEB                 
+  | 0xEC | 0xED | 0xEE | 0xEF                 
+  | 0xF2 | 0xF3 | 0xF4 | 0xF5 | 0xF6          
+  | 0xF9 | 0xFA | 0xFB | 0xFC; 
+ 
+Tokens
+ this = 'This';
+ is = 'is';
+ program = 'program';
+ let = 'Let';
+ us = 'us';
+ begin = 'begin';
+ that_maiusculo = 'That';
+ would = 'would';
+ be = 'be';
+ all = 'all';
+ it = 'It';
+ presents = 'presents';
+ alterable = 'alterable';
+ unalterable = 'unalterable';
+ just = 'just';
+ in = 'in';
+ case = 'case';
+ that_minusculo = 'that';
+ as = 'as';
+ long = 'long';
+ considering = 'considering';
+ number = 'number';
+ answer = 'answer';
+ answer_valores = ('yes' | 'no');
+ symbol = 'symbol';
+ vazio = (espaco | tab | rc | nl)+;
+ identificador = letra_masc (letra_masc | letra_min | underline)*;
+ vector = 'vector';
+ from = 'from';
+ to = 'to';
+ by = 'by';
+ do = 'do';
+ of = 'of';
+ otherwise = 'otherwise';
+ go = 'go';
+ next = 'next';
+ iteration = 'iteration';
+ capture = 'capture';
+ show = 'show';
+ abandon = 'abandon';
+ abre_parenteses = '(';
+ fecha_parenteses = ')';
+ abre_colchetes = '[';
+ fecha_colchetes = ']';
+ abre_chaves = '{';
+ fecha_chaves = '}';
+ numero = (digito+ | digito+ '.' digito+);
+ intermedio_vetor = 'x';
+ ponto_virgula = ';';
+ virgula = ',';
+ string = '"' (letra_masc | letra_min | caracter_especial | digito | elementos_acento)* '"';
+ ponto_final = '.';
+ dois_pontos = ':';
+ comentario = '{' (letra_masc | letra_min | digito | any_char_menos_chave)* '}';
+ barra_vertical = '|';
+ char = ''' (letra_min | caracter_especial_menos_aspas_simples | elementos_acento | letra_masc | digito | single_bar'n' | single_bar't'| single_bar single_bar | single_bar single_quote) ''';
+
+//operadores
+ equal = '==';
+ assign = ':=';
+ vinculacao = '=';
+ not_equal = '!=';
+ less_equal = '<=';
+ greater_equal = '>=';
+ less = '<';
+ greater = '>';
+ plus = '+';
+ minus = '-';
+ times = '*';
+ divide = '/';
+ and = 'and';
+ or = 'or';
+ xor = 'xor';
+ not = '!';
+ int_divide = '//';
+ 
+Ignored Tokens
+ comentario, vazio;
+ 
+Productions
+
+start = program_prod;
+
+// definição dos auxiliares
+intermedio_vetor_expressoes = intermedio_vetor exp;
+virgula_expressoes = virgula exp;
+variaveis_virgula = var virgula;
+expressoes_virgula = exp virgula;
+
+unalterable_valor = vinculacao valor;
+
+otherwise_do_geral = otherwise do comando_geral;
+otherwise_do_loop = otherwise do comando_com_laco;
+
+// produções
+program_prod = this is program identificador ponto_final declaracoes? comandos?;
+
+declaracoes = it presents dois_pontos declaracao+;
+
+comandos = let us begin dois_pontos comando_geral+ that_maiusculo would be all ponto_final;
+
+declaracao =
+    {variavel} alterable tipo identificador ponto_virgula
+  | {const} unalterable tipo identificador unalterable_valor? ponto_virgula
+  | {vetor} vector of tipo abre_parenteses exp intermedio_vetor_expressoes* fecha_parenteses identificador ponto_virgula;
+    
+tipo = {number} number | {answer} answer | {symbol} symbol;
+
+var = 
+	{identificador} identificador 
+	| {identificador_vetor} identificador abre_parenteses exp virgula_expressoes* fecha_parenteses;
+
+unalt = identificador;
+
+valor =
+    {symbol} char
+  | {answer} answer_valores
+  | {numero} numero
+  | {string} string;
+
+just_in_case_completo =
+    {just_in_no_otherwise} just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_geral;
+
+just_in_case_loop =
+    just in case that_minusculo abre_parenteses exp fecha_parenteses do comando_com_laco;
+
+comando_base = 
+	  {atribuicao_var} var assign exp ponto_virgula
+	| {atribuicao_const} unalt vinculacao exp ponto_virgula
+	| {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
+	| {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
+	| {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
+	| {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco
+	| {just} just_in_case_completo;
+	
+comando_geral =
+    comando_base
+  | {bloco} bloco;
+
+comando_com_laco =
+      {atribuicao_var} var assign exp ponto_virgula
+    | {atribuicao_const} unalt vinculacao exp ponto_virgula
+    | {capture} capture abre_parenteses variaveis_virgula* var fecha_parenteses ponto_virgula
+    | {show} show abre_parenteses expressoes_virgula* exp fecha_parenteses ponto_virgula
+    | {aslongas} as long [as2]:as abre_parenteses exp fecha_parenteses do comando_com_laco
+    | {considering} considering var from exp to [exp2]:exp by [exp3]:exp do comando_com_laco
+    | {just} just_in_case_loop
+    | {abandon} abandon ponto_virgula
+    | {gotonext} go to next iteration ponto_virgula
+    | {bloco} bloco_com_laco;
+
+bloco = abre_colchetes declaracao* comando_geral* fecha_colchetes;
+
+bloco_com_laco = abre_colchetes declaracao* comando_com_laco* fecha_colchetes;
+
+exp {-> exp} =
+    [valor]:exp_xor {-> valor.exp};
+
+exp_xor {-> exp} = 
+    {xor} [left]:exp_xor xor [right]:exp_or {-> New exp.xor(left.exp, right.exp)}
+  | {solo} [valor]:exp_or {-> valor.exp};
+
+exp_or {-> exp} = 
+    {or} [left]:exp_or or [right]:exp_and {-> New exp.or(left.exp, right.exp)}
+  | {solo} [valor]:exp_and {-> valor.exp};
+
+exp_and {-> exp} = 
+    {and} [left]:exp_and and [right]:exp_cmp {-> New exp.and(left.exp, right.exp)}
+  | {solo} [valor]:exp_cmp {-> valor.exp};
+
+exp_cmp {-> exp} =
+    {igualdade} [left]:exp_cmp equal [right]:exp_termo {-> New exp.equal(left.exp, right.exp)}
+  | {desigualdade} [left]:exp_cmp not_equal [right]:exp_termo {-> New exp.not_equal(left.exp, right.exp)}
+  | {menor} [left]:exp_cmp less [right]:exp_termo {-> New exp.less(left.exp, right.exp)}
+  | {menor_igual} [left]:exp_cmp less_equal [right]:exp_termo {-> New exp.less_equal(left.exp, right.exp)}
+  | {maior} [left]:exp_cmp greater [right]:exp_termo {-> New exp.greater(left.exp, right.exp)}
+  | {maior_igual} [left]:exp_cmp greater_equal [right]:exp_termo {-> New exp.greater_equal(left.exp, right.exp)}
+  | {solo} [valor]:exp_termo {-> valor.exp};
+
+exp_termo {-> exp} =
+    {soma} [left]:exp_termo plus [right]:exp_fator {-> New exp.plus(left.exp, right.exp)}
+  | {sub} [left]:exp_termo minus [right]:exp_fator {-> New exp.minus(left.exp, right.exp)}
+  | {solo} [solo_exp]:exp_fator {-> solo_exp.exp};
+
+exp_fator {-> exp} =
+    {mul} [left]:exp_fator times [right]:exp_unario {-> New exp.times(left.exp, right.exp)}
+  | {div} [left]:exp_fator divide [right]:exp_unario {-> New exp.divide(left.exp, right.exp)}
+  | {div_int} [left]:exp_fator int_divide [right]:exp_unario {-> New exp.int_divide(left.exp, right.exp)}
+  | {solo} [solo]:exp_unario {-> solo.exp};
+
+exp_unario {-> exp} =
+    {negativo} minus [solo_exp]:exp_unario {-> New exp.minus_exp(solo_exp.exp)}
+  | {not} not [solo_exp]:exp_unario {-> New exp.not(solo_exp.exp)}
+  | {solo} [pass_exp]:exp_primario {-> pass_exp.exp};
+
+exp_primario {-> exp} =
+    {numero} [numero]:numero {-> New exp.numero(numero)}
+  | {string} [string]:string {-> New exp.string(string)}
+  | {char} [char]:char {-> New exp.char(char)}
+  | {bool} [answer]:answer_valores {-> New exp.bool(answer)}
+  | {var} [var]:var {-> New exp.var(var)}
+  | {parenteses} abre_parenteses [subexp]:exp fecha_parenteses {-> subexp};
+  
+  
+Abstract Syntax Tree
+
+exp =
+    {xor} [left]:exp [right]:exp
+  | {or} [left]:exp [right]:exp
+  | {and} [left]:exp [right]:exp
+  | {equal} [left]:exp [right]:exp
+  | {not_equal} [left]:exp [right]:exp
+  | {less} [left]:exp [right]:exp
+  | {less_equal} [left]:exp [right]:exp
+  | {greater} [left]:exp [right]:exp
+  | {greater_equal} [left]:exp [right]:exp
+  | {plus} [left]:exp [right]:exp
+  | {minus} [left]:exp [right]:exp
+  | {times} [left]:exp [right]:exp
+  | {divide} [left]:exp [right]:exp
+  | {int_divide} [left]:exp [right]:exp
+  | {minus_exp} [exp]:exp
+  | {not} [exp]:exp
+  | {numero} numero
+  | {string} string
+  | {char} char
+  | {var} var
+  | {bool} answer_valores;
+  
+var =
+    {identificador} identificador
+  | {identificador_vetor} identificador [exp]:exp [exp_restante]:exp*;

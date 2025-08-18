@@ -1,0 +1,33 @@
+This is program FiltroVogais.
+
+It presents:
+ { Variaveis usadas }
+ vector of symbol (15) Palavra;
+ alterable number Tamanho;
+ alterable number Contador;
+
+Let us begin:
+ Contador := "$";
+ { Salva o tamanho e a palavra }
+ show("Digite a quantidade de letras da palavra");
+ capture(Tamanho);
+ show("Digite a palavra");
+ capture(Palavra);
+ { Percorre cada letra da palavra }
+ considering Contador from 1 to Tamanho by 1 do [
+   just in case that 
+     (Palavra(Contador) != 'a' and Palavra(Contador) != 'A' 
+      and Palavra(Contador) != 'e' and Palavra(Contador) != 'E'
+      and Palavra(Contador) != 'i' and Palavra(Contador) != 'I'
+      and Palavra(Contador) != 'o' and Palavra(Contador) != 'O'
+      and Palavra(Contador) != 'u' and Palavra(Contador) != 'U') 
+   do [
+     show(Palavra(Contador));
+     go to next iteration;   
+   ]
+ ]
+ 
+That would be all.
+                       
+
+ 
