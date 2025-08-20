@@ -120,20 +120,18 @@ expressoes_virgula {-> exp} = exp virgula {-> exp};
 
 unalterable_valor {-> exp} = vinculacao valor {-> valor.exp};
 
-this_is_program = this is program;
-
 otherwise_do_geral {-> comando} = otherwise do comando_geral {-> comando_geral.comando};
 otherwise_do_loop {-> comando} = otherwise do comando_com_laco {-> comando_com_laco.comando};
 
 // produções
-program_prod {-> programa} = this_is_program identificador ponto_final declaracoes? comandos? 
-    {-> New programa(identificador, declaracoes.let_us_begin, comandos.it_presents)};
+program_prod {-> programa} = this is program identificador ponto_final declaracoes? comandos? 
+    {-> New programa(this, is, program, identificador, ponto_final ,declaracoes.declaracoes, comandos.comandos)};
 
-declaracoes {-> let_us_begin} = it presents dois_pontos declaracao+ 
-    {-> New let_us_begin([declaracao.declaracao])};
+declaracoes {-> declaracoes} = it presents dois_pontos declaracao+ 
+    {-> New declaracoes(it, presents, dois_pontos,[declaracao.declaracao])};
 
-comandos {-> it_presents} = let us begin dois_pontos comando_geral+ that_maiusculo would be all ponto_final 
-    {-> New it_presents([comando_geral.comando])};
+comandos {-> comandos} = let us begin dois_pontos comando_geral+ that_maiusculo would be all ponto_final 
+    {-> New comandos(let, us, begin, dois_pontos,[comando_geral.comando], that_maiusculo, would, be, all, ponto_final)};
 
 declaracao {-> declaracao} =
     {variavel} alterable tipo identificador ponto_virgula 
@@ -268,11 +266,11 @@ exp_primario {-> exp} =
   
 Abstract Syntax Tree
 
-programa = identificador [secao_declaracoes]:let_us_begin? [secao_comandos]:it_presents?;
+programa = this is program identificador ponto_final [secao_declaracoes]:declaracoes? [secao_comandos]:comandos?;
 
-let_us_begin = [declaracoes]:declaracao*;
+declaracoes = it presents dois_pontos [declaracoes]:declaracao*;
 
-it_presents = [comandos]:comando*;
+comandos = let us begin dois_pontos [comandos]:comando* that_maiusculo would be all ponto_final;
 
 declaracao =
     {variavel} [tipo]:tipo identificador
