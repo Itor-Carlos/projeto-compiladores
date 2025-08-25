@@ -125,13 +125,13 @@ otherwise_do_loop {-> comando} = otherwise do comando_com_laco {-> comando_com_l
 
 // produções
 program_prod {-> programa} = this is program identificador ponto_final declaracoes? comandos? 
-    {-> New programa(this, is, program, identificador, ponto_final ,declaracoes.declaracoes, comandos.comandos)};
+    {-> New programa(identificador,declaracoes.declaracoes, comandos.comandos)};
 
 declaracoes {-> declaracoes} = it presents dois_pontos declaracao+ 
-    {-> New declaracoes(it, presents, dois_pontos,[declaracao.declaracao])};
+    {-> New declaracoes([declaracao.declaracao])};
 
 comandos {-> comandos} = let us begin dois_pontos comando_geral+ that_maiusculo would be all ponto_final 
-    {-> New comandos(let, us, begin, dois_pontos,[comando_geral.comando], that_maiusculo, would, be, all, ponto_final)};
+    {-> New comandos([comando_geral.comando])};
 
 declaracao {-> declaracao} =
     {variavel} alterable tipo identificador ponto_virgula 
@@ -266,11 +266,11 @@ exp_primario {-> exp} =
   
 Abstract Syntax Tree
 
-programa = this is program identificador ponto_final [secao_declaracoes]:declaracoes? [secao_comandos]:comandos?;
+programa = identificador [secao_declaracoes]:declaracoes? [secao_comandos]:comandos?;
 
-declaracoes = it presents dois_pontos [declaracoes]:declaracao*;
+declaracoes = [declaracoes]:declaracao*;
 
-comandos = let us begin dois_pontos [comandos]:comando* that_maiusculo would be all ponto_final;
+comandos = [comandos]:comando*;
 
 declaracao =
     {variavel} [tipo]:tipo identificador
