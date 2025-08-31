@@ -1,0 +1,38 @@
+This is program SituacaoAluno.
+
+It presents:
+
+alterable number Primeira_Nota;
+alterable number Segunda_Nota;
+alterable number Media;
+alterable number Faltas;
+vector of symbol (100) Nome;
+
+Let us begin:
+
+show("Digite o nome do aluno\n");
+capture(Nome);
+show("Digite a primeira nota do aluno\n");
+capture(Primeira_Nota);
+show("Digite a segunda nota do aluno\n");
+capture(Segunda_Nota);
+show("Digite a quantidade de faltas do aluno\n");
+capture(Faltas);
+
+
+{Verifica se os aluno tirou notas diferentes}
+just in case that (Primeira_Nota != Segunda_Nota) do
+	show(Nome, "Tirou notas diferentes ao longo do semestre.\n");
+
+
+Media := (Primeira_Nota + Segunda_Nota)/2;
+
+
+{Verifica se o aluno foi reprovado por média ou falta}
+just in case that (Media < 5 or Faltas > 15) do
+    show(Nome, " com media ", Media, " : REPROVADO POR MÉDIA OU FALTA EM COMPILADORES\n");
+
+
+That would be all.
+
+
