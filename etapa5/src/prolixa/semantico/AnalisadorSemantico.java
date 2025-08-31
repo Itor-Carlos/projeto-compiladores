@@ -40,13 +40,14 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void outAVariavelDeclaracao(AVariavelDeclaracao node) {
         String nome = node.getIdentificador().getText();
         Tipagem tipo = traduzTipo(node.getTipo());
+        
+        System.out.println(nome.toString());
 
-        if (tabela.search(nome) != null) {
+        if (tabela.searchLocal(nome) != null) {
             errorMessageSemantico(node, "Identificador " + nome + " já declarado.");
-        } else {
-            Simbolo simbolo = new Simbolo(
-                nome, tipo, TipoSimbolo.VARIAVEL, true, false, 0
-            );
+        } 
+        else {
+            Simbolo simbolo = new Simbolo( nome, tipo, TipoSimbolo.VARIAVEL, true, false, 0, null);
             tabela.add(nome, simbolo);
         }
     }
@@ -56,7 +57,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         String nome = node.getIdentificador().getText();
         Tipagem tipo = traduzTipo(node.getTipo());
 
-        if (tabela.search(nome) != null) {
+        if (tabela.searchLocal(nome) != null) {
             errorMessageSemantico(node, "Constante " + nome + " já declarada.");
         } else {
             if (node.getValor() != null) {
@@ -64,14 +65,11 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
                 if (tipo != tipagemExp) {
                     errorMessageSemantico(node, "Tipo incompatível na constante " + nome);
                 }
-                Simbolo simbolo = new Simbolo(
-                    nome, tipo, TipoSimbolo.CONSTANTE, false, true, 0
-                );
+                Simbolo simbolo = new Simbolo(nome, tipo, TipoSimbolo.CONSTANTE, false, true, 0, node.getValor());
                 tabela.add(nome, simbolo);
             } else {
                 Simbolo simbolo = new Simbolo(
-                    nome, tipo, TipoSimbolo.CONSTANTE, false, false, 0
-                );
+                    nome, tipo, TipoSimbolo.CONSTANTE, false, false, 0, null);
                 tabela.add(nome, simbolo);
             }
         }
@@ -82,7 +80,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         String nome = node.getIdentificador().getText();
         Tipagem tipo = traduzTipo(node.getTipo());
 
-        if (tabela.search(nome) != null) {
+        if (tabela.searchLocal(nome) != null) {
             errorMessageSemantico(node, "Vetor " + nome + " já declarado.");
         } else {
             // valida dimensões > 0
@@ -93,8 +91,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
                 }
             }
             Simbolo simbolo = new Simbolo(
-                nome, tipo, TipoSimbolo.VETOR, true, false, 0
-            );
+                nome, tipo, TipoSimbolo.VETOR, true, false, 0, null);
             tabela.add(nome, simbolo);
         }
     }
@@ -104,9 +101,14 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void outAVarExp(AVarExp node) {
         String nome = node.getVar().toString().trim();
         Simbolo simbolo = tabela.search(nome);
-
+       
+        System.out.println(node.getVar());
+        System.out.println("aahdasuihdasd");
+        
         if (simbolo == null) {
             errorMessageSemantico(node, "Variável " + nome + " não declarada.");
+        } else if (!simbolo.isInicializada()) {
+            errorMessageSemantico(node, "Variável " + nome + " usada sem inicialização.");
         }
     }
 
@@ -115,7 +117,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void outAAtribuicaoVarComando(AAtribuicaoVarComando node) {
         String nome = node.getVar().toString().trim();
         Simbolo simbolo = tabela.search(nome);
-
+       
         if (simbolo == null) {
             errorMessageSemantico(node, "Variável " + nome + " não declarada.");
         } else if (!simbolo.isAlterable()) {
@@ -157,6 +159,18 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         }
     }
     
+    @Override
+    public void inAConsideringComando(AConsideringComando node){
+        String nome = node.getVar().toString().trim();
+        Simbolo simbolo = tabela.search(nome);
+        
+        if (simbolo == null) {
+            //errorMessageSemantico(node, "Variável " + nome + " não declarada.");
+            return;
+        }
+        simbolo.setInicializada(true);
+    }
+    
     
     @Override
     public void outAJustInCaseComando(AJustInCaseComando node) {
@@ -176,26 +190,34 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
 
     @Override
     public void outAConsideringComando(AConsideringComando node) {
-        String nome = node.getVar().toString().trim();
+    	String nome = node.getVar().toString().trim();
         Simbolo simbolo = tabela.search(nome);
+        
         if (simbolo == null) {
-            errorMessageSemantico(node, "Variável " + nome + " não declarada.");
             return;
         }
-        // início, fim e incremento precisam ser NUMBER ou SYMBOL
+
+        if (simbolo.getTipo() != Tipagem.NUMBER && simbolo.getTipo() != Tipagem.SYMBOL) {
+            errorMessageSemantico(node, "Variável de controle de 'considering' deve ser number ou symbol.");
+        }
+        
         Tipagem inicio = infereTipoExp(node.getInicio());
         Tipagem fim = infereTipoExp(node.getFim());
-        Tipagem inc = infereTipoExp(node.getIncremento());
-
+        Tipagem incremento = infereTipoExp(node.getIncremento());
+        
+        System.out.println(incremento);
+        
         if (inicio != Tipagem.NUMBER && inicio != Tipagem.SYMBOL) {
             errorMessageSemantico(node, "Expressão inicial de 'considering' deve ser number ou symbol.");
         }
         if (fim != Tipagem.NUMBER && fim != Tipagem.SYMBOL) {
             errorMessageSemantico(node, "Expressão final de 'considering' deve ser number ou symbol.");
         }
-        if (inc != Tipagem.NUMBER && inc != Tipagem.SYMBOL) {
+        if (incremento != Tipagem.NUMBER && incremento != Tipagem.SYMBOL) {
             errorMessageSemantico(node, "Incremento de 'considering' deve ser number ou symbol.");
         }
+        
+        simbolo.setInicializada(true);
     }
 
     // === Procedimentos Primitivos ===
@@ -214,42 +236,19 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
 
     @Override
     public void outAShowComando(AShowComando node) {
-        for (PExp e : node.getExpressoes()) {
-            infereTipoExp(e); // só força validação
-        }
+
     }
 
     // === Comandos de interrupção ===
     @Override
     public void outAAbandonComando(AAbandonComando node) {
-        // nada semântico além de checar se está dentro de laço (opcional)
-        // você pode implementar uma flag de "contexto de laço"
+        
     }
 
     @Override
     public void outAGotonextComando(AGotonextComando node) {
-        // idem ao abandon
-    }
 
-    // === Uso de Vetores ===
-//    @Override
-//    public void outAVarIdentificadorVetor(AVarIdentificadorVetor node) {
-//        String nome = node.getIdentificador().getText();
-//        Simbolo simbolo = tabela.search(nome);
-//
-//        if (simbolo == null) {
-//            errorMessageSemantico(node, "Vetor " + nome + " não declarado.");
-//        } else if (simbolo.getTipoSimbolo() != TipoSimbolo.VETOR) {
-//            errorMessageSemantico(node, nome + " não é vetor.");
-//        } else {
-//            for (PExp idx : node.getIndices()) {
-//                Tipagem tipagem = infereTipoExp(idx);
-//                if (tipagem != Tipagem.NUMBER) {
-//                    errorMessageSemantico(node, "Índice de vetor deve ser do tipo number.");
-//                }
-//            }
-//        }
-//    }
+    }
 
     // === Auxiliares ===
     private Tipagem traduzTipo(Node tipo) {
@@ -260,41 +259,39 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     }
 
     private Tipagem infereTipoExp(PExp exp) {
-        if (exp instanceof ANumeroExp) {
+        if (exp instanceof ANumeroExp) return Tipagem.NUMBER;
+        if (exp instanceof ABoolExp) return Tipagem.ANSWER;
+        if (exp instanceof ACharExp) return Tipagem.SYMBOL;
+        if (exp instanceof AVarExp) {
+            String nome = ((AVarExp) exp).getVar().toString().trim();
+            Simbolo s = tabela.search(nome);
+            return (s != null) ? s.getTipo() : null;
+        }
+        if (exp instanceof APlusExp || exp instanceof AMinusExp ||
+            exp instanceof ATimesExp || exp instanceof ADivideExp ||
+            exp instanceof AIntDivideExp) {
             return Tipagem.NUMBER;
-        } else if (exp instanceof ABoolExp) {
-            return Tipagem.ANSWER;
-        } else if (exp instanceof ACharExp) {
-            return Tipagem.SYMBOL;
-        } else if (
-            exp instanceof APlusExp ||
-            exp instanceof AMinusExp ||
-            exp instanceof ATimesExp ||
-            exp instanceof ADivideExp
-        ) {
-            return Tipagem.NUMBER;
-        } else if (
-            exp instanceof AAndExp ||
-            exp instanceof AOrExp
-        ) {
-            return Tipagem.ANSWER;
-        } else if (
-            exp instanceof AEqualExp ||
-            exp instanceof AMinusExpExp ||
-            exp instanceof ALessExp ||
-            exp instanceof AGreaterExp
-        ) {
+        }
+        if (exp instanceof AAndExp || exp instanceof AOrExp || exp instanceof AXorExp) {
             return Tipagem.ANSWER;
         }
-        return Tipagem.ANSWER;
+        if (exp instanceof AEqualExp || exp instanceof ANotEqualExp ||
+            exp instanceof ALessExp || exp instanceof ALessEqualExp ||
+            exp instanceof AGreaterExp || exp instanceof AGreaterEqualExp) {
+            return Tipagem.ANSWER;
+        }
+        if (exp instanceof ANotExp) {
+            return Tipagem.ANSWER;
+        }
+        if (exp instanceof AMinusExpExp) {
+            return Tipagem.NUMBER;
+        }
+        return null;
     }
-
+    
     // === Mensagens de erro ===
     private void errorMessageSemantico(Node node, String mensagem) {
-//        Token token = (Token) node.();
-//        int linha = token.getLine();
-//        int coluna = token.getPos() + 1; // +1 porque normalmente é indexado de 0
-//        System.err.println("[Erro Semântico] Linha " + linha + ", Coluna " + coluna + ": " + mensagem);
+        System.err.println("[Erro Semântico] " + mensagem);
     }
 
     @Override

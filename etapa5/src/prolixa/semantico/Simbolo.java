@@ -7,16 +7,18 @@ public class Simbolo {
 	public final boolean alterable;
 	public boolean inicializada;
 	public final int dimensoes;
+	public Object valor;
 	 
 	
 	//Criar um segundo Simbolo para colocar sem as dimensões
-	public Simbolo(String nome, Tipagem tipo,TipoSimbolo tipoSimbolo, boolean alterable, boolean inicializada, int dimensoes) {
+	public Simbolo(String nome, Tipagem tipo,TipoSimbolo tipoSimbolo, boolean alterable, boolean inicializada, int dimensoes, Object valor) {
 		this.nome = nome;
 		this.tipo = tipo;
 		this.tipoSimbolo = tipoSimbolo;
 		this.alterable = alterable;
 		this.inicializada = inicializada;
 		this.dimensoes = dimensoes;
+		this.valor = valor;
 	}
 	
 	public String getNome() {
@@ -44,6 +46,11 @@ public class Simbolo {
 	}
 	
 	public boolean isInicializada() { return inicializada; }
+	
+	public void setValor(Object valor) {
+		this.setInicializada(true);
+		this.valor = valor;
+	}
 		
 //	@Override
 //	public String toString() {

@@ -44,14 +44,12 @@ public class TabelaSimbolos {
         }
         return null;
     }
-
-    public void findWithConsole(String key) {
-        Simbolo element = search(key);
-
-        if (element == null) {
-            System.out.println("Could not find " + key);
-        } else {
-            System.out.println("Identifier: " + key + "\n" + element.toString());
+    
+    public Simbolo searchLocal(String key) {
+        if (scopeList.isEmpty()) {
+            return null;
         }
+        HashMap<HashTableKey, Simbolo> tabelaSimbolo = scopeList.getFirst();
+        return tabelaSimbolo.get(new HashTableKey(key));
     }
 }
