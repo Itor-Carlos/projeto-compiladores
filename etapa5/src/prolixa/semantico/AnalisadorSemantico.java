@@ -242,6 +242,9 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void outAShowComando(AShowComando node) {
         for (PExp exp : node.getExpressoes()) {
             Tipagem tipoExp = infereTipoExp(exp);
+            
+            System.out.println(exp);
+            System.out.println(tipoExp);
 
             if (tipoExp == null) {
                 errorMessageSemantico(node, "Expressão em 'show' inválida");
@@ -272,6 +275,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     	if (exp instanceof ANumeroExp) return Tipagem.NUMBER;
         if (exp instanceof ABoolExp) return Tipagem.ANSWER;
         if (exp instanceof ACharExp) return Tipagem.SYMBOL;
+        if (exp instanceof AStringExp) return Tipagem.SYMBOL;
         
         if (exp instanceof AVarExp) {
             String nome = ((AVarExp) exp).getVar().toString().trim();
@@ -280,7 +284,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         }
         //Operações numéricas
         if (exp instanceof APlusExp) {
-        	System.out.println("aqui");
+        	//System.out.println("aqui");
             APlusExp e = (APlusExp) exp;
             Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
             Tipagem operadorDireita = infereTipoExp(e.getRight());
@@ -423,7 +427,6 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         if(exp instanceof AMinusExpExp) {
         	AMinusExpExp expMinusExp = (AMinusExpExp) exp;
         	Tipagem operadorEsquerda = infereTipoExp(expMinusExp.getExp());
-        	System.out.println(operadorEsquerda);
         	if(operadorEsquerda != Tipagem.NUMBER) {
         		errorMessageSemantico(exp, "Operador '-' só pode ser usado em valores do tipo NUMBER");
         	}
@@ -434,8 +437,9 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     
     // === Mensagens de erro ===
     private void errorMessageSemantico(Node node, String mensagem) {
-        System.err.println("[Erro Semântico] " + mensagem);
+        throw new SemanticoError("Erro semântico: " + node + ": " + mensagem);
     }
+
 
     @Override
     public String toString() {
