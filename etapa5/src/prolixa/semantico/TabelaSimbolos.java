@@ -5,21 +5,21 @@ import java.util.LinkedList;
 
 public class TabelaSimbolos {
 
-    private LinkedList<HashMap<HashTableKey, Simbolo>> scopeList;
+    private LinkedList<HashMap<Hash, Simbolo>> scopeList;
 
     public TabelaSimbolos() {
         scopeList = new LinkedList<>();
     }
 
     public void push() {
-        scopeList.addFirst(new HashMap<HashTableKey, Simbolo>());
+        scopeList.addFirst(new HashMap<Hash, Simbolo>());
     }
 
-    public HashMap<HashTableKey, Simbolo> pop() {
+    public HashMap<Hash, Simbolo> pop() {
         return scopeList.removeFirst();
     }
 
-    public HashMap<HashTableKey, Simbolo> getTopSimbolo() {
+    public HashMap<Hash, Simbolo> getTopSimbolo() {
         return scopeList.getFirst();
     }
 
@@ -27,16 +27,16 @@ public class TabelaSimbolos {
         if (scopeList.size() < 1)
             this.push();
 
-        HashMap<HashTableKey, Simbolo> tabelaSimbolo = scopeList.getFirst();
-        tabelaSimbolo.put(new HashTableKey(key), informacoesSimbolo);
+        HashMap<Hash, Simbolo> tabelaSimbolo = scopeList.getFirst();
+        tabelaSimbolo.put(new Hash(key), informacoesSimbolo);
     }
 
     public Simbolo search(String key) {
         int sizeScopeList = this.scopeList.size();
 
         for (int i = 0; i < sizeScopeList; i++) {
-            HashMap<HashTableKey, Simbolo> table = scopeList.get(i);
-            Simbolo element = table.get(new HashTableKey(key));
+            HashMap<Hash, Simbolo> table = scopeList.get(i);
+            Simbolo element = table.get(new Hash(key));
 
             if (element != null) {
                 return element;
@@ -49,7 +49,7 @@ public class TabelaSimbolos {
         if (scopeList.isEmpty()) {
             return null;
         }
-        HashMap<HashTableKey, Simbolo> tabelaSimbolo = scopeList.getFirst();
-        return tabelaSimbolo.get(new HashTableKey(key));
+        HashMap<Hash, Simbolo> tabelaSimbolo = scopeList.getFirst();
+        return tabelaSimbolo.get(new Hash(key));
     }
 }
