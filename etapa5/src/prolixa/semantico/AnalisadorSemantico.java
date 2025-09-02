@@ -41,7 +41,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         String nome = node.getIdentificador().getText();
         Tipagem tipo = traduzTipo(node.getTipo());
         
-        System.out.println(nome.toString());
+        //System.out.println(nome.toString());
 
         if (tabela.searchLocal(nome) != null) {
             errorMessageSemantico(node, "Identificador " + nome + " já declarado.");
@@ -102,8 +102,8 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         String nome = node.getVar().toString().trim();
         Simbolo simbolo = tabela.search(nome);
        
-        System.out.println(node.getVar());
-        System.out.println("aahdasuihdasd");
+        //System.out.println(node.getVar());
+        //System.out.println("aahdasuihdasd");
         
         if (simbolo == null) {
             errorMessageSemantico(node, "Variável " + nome + " não declarada.");
@@ -117,7 +117,9 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void outAAtribuicaoVarComando(AAtribuicaoVarComando node) {
         String nome = node.getVar().toString().trim();
         Simbolo simbolo = tabela.search(nome);
-       
+        
+        //System.out.println(node);       
+        
         if (simbolo == null) {
             errorMessageSemantico(node, "Variável " + nome + " não declarada.");
         } else if (!simbolo.isAlterable()) {
@@ -133,6 +135,11 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             }
             simbolo.setInicializada(true);
         }
+    }
+    
+    @Override
+    public void inAPlusExp(APlusExp node){
+        //System.out.println(node);
     }
 
     @Override
@@ -165,7 +172,6 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         Simbolo simbolo = tabela.search(nome);
         
         if (simbolo == null) {
-            //errorMessageSemantico(node, "Variável " + nome + " não declarada.");
             return;
         }
         simbolo.setInicializada(true);
@@ -204,9 +210,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         Tipagem inicio = infereTipoExp(node.getInicio());
         Tipagem fim = infereTipoExp(node.getFim());
         Tipagem incremento = infereTipoExp(node.getIncremento());
-        
-        System.out.println(incremento);
-        
+                
         if (inicio != Tipagem.NUMBER && inicio != Tipagem.SYMBOL) {
             errorMessageSemantico(node, "Expressão inicial de 'considering' deve ser number ou symbol.");
         }
@@ -236,7 +240,13 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
 
     @Override
     public void outAShowComando(AShowComando node) {
+        for (PExp exp : node.getExpressoes()) {
+            Tipagem tipoExp = infereTipoExp(exp);
 
+            if (tipoExp == null) {
+                errorMessageSemantico(node, "Expressão em 'show' inválida");
+            }
+        }
     }
 
     // === Comandos de interrupção ===
@@ -259,32 +269,165 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     }
 
     private Tipagem infereTipoExp(PExp exp) {
-        if (exp instanceof ANumeroExp) return Tipagem.NUMBER;
+    	if (exp instanceof ANumeroExp) return Tipagem.NUMBER;
         if (exp instanceof ABoolExp) return Tipagem.ANSWER;
         if (exp instanceof ACharExp) return Tipagem.SYMBOL;
+        
         if (exp instanceof AVarExp) {
             String nome = ((AVarExp) exp).getVar().toString().trim();
             Simbolo s = tabela.search(nome);
             return (s != null) ? s.getTipo() : null;
         }
-        if (exp instanceof APlusExp || exp instanceof AMinusExp ||
-            exp instanceof ATimesExp || exp instanceof ADivideExp ||
-            exp instanceof AIntDivideExp) {
+        //Operações numéricas
+        if (exp instanceof APlusExp) {
+        	System.out.println("aqui");
+            APlusExp e = (APlusExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
+            Tipagem operadorDireita = infereTipoExp(e.getRight());
+            if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+                errorMessageSemantico(exp, "Operador '+' só pode ser usado com number.");
+                return null;
+            }
             return Tipagem.NUMBER;
         }
-        if (exp instanceof AAndExp || exp instanceof AOrExp || exp instanceof AXorExp) {
+        if (exp instanceof AMinusExp) {
+            AMinusExp e = (AMinusExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
+            Tipagem operadorDireita = infereTipoExp(e.getRight());
+            if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+                errorMessageSemantico(exp, "Operador '-' só pode ser usado com number.");
+                return null;
+            }
+            return Tipagem.NUMBER;
+        }
+        
+        if (exp instanceof ATimesExp) {
+        	ATimesExp expTimes = (ATimesExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(expTimes.getLeft());
+            Tipagem operadorDireita = infereTipoExp(expTimes.getRight());
+            if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+                errorMessageSemantico(exp, "Operador '-' só pode ser usado com number.");
+                return null;
+            }
+            return Tipagem.NUMBER;
+        }
+       
+      //Não permitir divisão por zero: 
+        if(exp instanceof ADivideExp) {
+        	ADivideExp expDivide = (ADivideExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expDivide.getLeft());
+        	Tipagem operadorDireita = infereTipoExp(expDivide.getRight());
+        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '/' só pode comparar valores do mesmo tipo.");
+        	}
+        	return Tipagem.ANSWER;
+        }
+        if(exp instanceof AIntDivideExp) {
+        	AIntDivideExp expIntDivide = (AIntDivideExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expIntDivide.getLeft());
+        	Tipagem operadorDireita = infereTipoExp(expIntDivide.getRight());
+        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '//' só pode comparar valores do mesmo tipo.");
+        	}
+        	return Tipagem.ANSWER;
+        }
+        
+        
+        //Operações booleanas
+        if (exp instanceof AAndExp) {
+            AAndExp e = (AAndExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
+            Tipagem operadorDireita = infereTipoExp(e.getRight());
+            if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
+                errorMessageSemantico(exp, "Operador 'and' só pode ser usado com answer.");
+                return null;
+            }
             return Tipagem.ANSWER;
         }
-        if (exp instanceof AEqualExp || exp instanceof ANotEqualExp ||
-            exp instanceof ALessExp || exp instanceof ALessEqualExp ||
-            exp instanceof AGreaterExp || exp instanceof AGreaterEqualExp) {
+        if (exp instanceof AEqualExp) {
+            AEqualExp e = (AEqualExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
+            Tipagem operadorDireita = infereTipoExp(e.getRight());
+            if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
+                errorMessageSemantico(exp, "Operador '==' só pode comparar valores do mesmo tipo.");
+                return null;
+            }
+            return Tipagem.ANSWER;
+        }
+        if (exp instanceof AOrExp) {
+        	AOrExp expOr = (AOrExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(expOr.getLeft());
+            Tipagem operadorDireita = infereTipoExp(expOr.getRight());
+            if (operadorEsquerda == null || operadorDireita == null) {
+                errorMessageSemantico(exp, "Operador '==' só pode comparar valores do mesmo tipo.");
+                return null;
+            }
             return Tipagem.ANSWER;
         }
         if (exp instanceof ANotExp) {
+        	ANotExp expOr = (ANotExp) exp;
+            Tipagem operadorUnitario = infereTipoExp(expOr.getExp());
+            if (operadorUnitario == null) {
+                errorMessageSemantico(exp, "Operador '!' só pode ser utilizado em valores do tipo ANSWER");
+                return null;
+            }
             return Tipagem.ANSWER;
         }
-        if (exp instanceof AMinusExpExp) {
-            return Tipagem.NUMBER;
+        if (exp instanceof ANotEqualExp) {
+        	ANotEqualExp expNotEqual = (ANotEqualExp) exp;
+            Tipagem operadorEsquerda = infereTipoExp(expNotEqual.getLeft());
+            Tipagem operadorDireita = infereTipoExp(expNotEqual.getRight());
+            if (operadorEsquerda == null || operadorDireita == null) {
+                errorMessageSemantico(exp, "Operador '!=' só pode comparar valores do mesmo tipo.");
+                return null;
+            }
+            return Tipagem.ANSWER;
+        }
+        if(exp instanceof ALessExp) {
+        	ALessExp expLess = (ALessExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expLess.getLeft());
+        	Tipagem operadorDireita = infereTipoExp(expLess.getRight());
+        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '<' só pode comparar valores do mesmo tipo.");
+        	}
+        	return Tipagem.ANSWER;
+        }
+        if(exp instanceof ALessEqualExp) {
+        	ALessEqualExp expLessEqual = (ALessEqualExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expLessEqual.getLeft());
+        	Tipagem operadorDireita = infereTipoExp(expLessEqual.getRight());
+        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '<=' só pode comparar valores do mesmo tipo.");
+        	}
+        	return Tipagem.ANSWER;
+        }
+        if(exp instanceof AGreaterExp) {
+        	AGreaterExp expGreater = (AGreaterExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expGreater.getLeft());
+        	Tipagem operadorDireita = infereTipoExp(expGreater.getRight());
+        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '>' só pode comparar valores do mesmo tipo.");
+        	}
+        	return Tipagem.ANSWER;
+        }
+        if(exp instanceof AGreaterEqualExp) {
+        	AGreaterEqualExp expGreaterEqual = (AGreaterEqualExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expGreaterEqual.getLeft());
+        	Tipagem operadorDireita = infereTipoExp(expGreaterEqual.getRight());
+        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '>=' só pode comparar valores do mesmo tipo.");
+        	}
+        	return Tipagem.ANSWER;
+        }
+        
+        if(exp instanceof AMinusExpExp) {
+        	AMinusExpExp expMinusExp = (AMinusExpExp) exp;
+        	Tipagem operadorEsquerda = infereTipoExp(expMinusExp.getExp());
+        	System.out.println(operadorEsquerda);
+        	if(operadorEsquerda != Tipagem.NUMBER) {
+        		errorMessageSemantico(exp, "Operador '-' só pode ser usado em valores do tipo NUMBER");
+        	}
+        	return Tipagem.ANSWER;
         }
         return null;
     }
