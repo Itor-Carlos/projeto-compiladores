@@ -289,7 +289,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
             Tipagem operadorDireita = infereTipoExp(e.getRight());
             if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-                errorMessageSemantico(exp, "Operador '+' só pode ser usado com number.");
+            	errorMessageSemantico(exp, "Operador '+' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.NUMBER;
@@ -299,7 +299,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
             Tipagem operadorDireita = infereTipoExp(e.getRight());
             if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-                errorMessageSemantico(exp, "Operador '-' só pode ser usado com number.");
+            	errorMessageSemantico(exp, "Operador '-' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.NUMBER;
@@ -310,7 +310,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             Tipagem operadorEsquerda = infereTipoExp(expTimes.getLeft());
             Tipagem operadorDireita = infereTipoExp(expTimes.getRight());
             if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-                errorMessageSemantico(exp, "Operador '-' só pode ser usado com number.");
+            	errorMessageSemantico(exp, "Operador '*' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.NUMBER;
@@ -322,18 +322,18 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	Tipagem operadorEsquerda = infereTipoExp(expDivide.getLeft());
         	Tipagem operadorDireita = infereTipoExp(expDivide.getRight());
         	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '/' só pode comparar valores do mesmo tipo.");
+        		errorMessageSemantico(exp, "Operador '/' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
         	}
-        	return Tipagem.ANSWER;
+        	return Tipagem.NUMBER;
         }
         if(exp instanceof AIntDivideExp) {
         	AIntDivideExp expIntDivide = (AIntDivideExp) exp;
         	Tipagem operadorEsquerda = infereTipoExp(expIntDivide.getLeft());
         	Tipagem operadorDireita = infereTipoExp(expIntDivide.getRight());
         	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '//' só pode comparar valores do mesmo tipo.");
+        		errorMessageSemantico(exp, "Operador '//' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
         	}
-        	return Tipagem.ANSWER;
+        	return Tipagem.NUMBER;
         }
         
         
@@ -343,7 +343,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
             Tipagem operadorDireita = infereTipoExp(e.getRight());
             if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
-                errorMessageSemantico(exp, "Operador 'and' só pode ser usado com answer.");
+            	errorMessageSemantico(exp, "Operação 'and' exige ANSWER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.ANSWER;
@@ -353,7 +353,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
             Tipagem operadorDireita = infereTipoExp(e.getRight());
             if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
-                errorMessageSemantico(exp, "Operador '==' só pode comparar valores do mesmo tipo.");
+            	errorMessageSemantico(exp, "Operação '==' exige tipos iguais, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.ANSWER;
@@ -362,8 +362,8 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	AOrExp expOr = (AOrExp) exp;
             Tipagem operadorEsquerda = infereTipoExp(expOr.getLeft());
             Tipagem operadorDireita = infereTipoExp(expOr.getRight());
-            if (operadorEsquerda == null || operadorDireita == null) {
-                errorMessageSemantico(exp, "Operador '==' só pode comparar valores do mesmo tipo.");
+            if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
+            	errorMessageSemantico(exp, "Operação 'or' exige ANSWER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.ANSWER;
@@ -371,8 +371,8 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         if (exp instanceof ANotExp) {
         	ANotExp expOr = (ANotExp) exp;
             Tipagem operadorUnitario = infereTipoExp(expOr.getExp());
-            if (operadorUnitario == null) {
-                errorMessageSemantico(exp, "Operador '!' só pode ser utilizado em valores do tipo ANSWER");
+            if (operadorUnitario != Tipagem.ANSWER) {
+                errorMessageSemantico(exp, "Operação 'not' exige ANSWER, mas encontrou " + operadorUnitario);
                 return null;
             }
             return Tipagem.ANSWER;
@@ -381,8 +381,8 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	ANotEqualExp expNotEqual = (ANotEqualExp) exp;
             Tipagem operadorEsquerda = infereTipoExp(expNotEqual.getLeft());
             Tipagem operadorDireita = infereTipoExp(expNotEqual.getRight());
-            if (operadorEsquerda == null || operadorDireita == null) {
-                errorMessageSemantico(exp, "Operador '!=' só pode comparar valores do mesmo tipo.");
+            if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
+                errorMessageSemantico(exp, "Operador '!=' exige tipos iguais, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
                 return null;
             }
             return Tipagem.ANSWER;
@@ -392,7 +392,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	Tipagem operadorEsquerda = infereTipoExp(expLess.getLeft());
         	Tipagem operadorDireita = infereTipoExp(expLess.getRight());
         	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '<' só pode comparar valores do mesmo tipo.");
+        		errorMessageSemantico(exp, "Operação '<' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
         	}
         	return Tipagem.ANSWER;
         }
@@ -401,7 +401,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	Tipagem operadorEsquerda = infereTipoExp(expLessEqual.getLeft());
         	Tipagem operadorDireita = infereTipoExp(expLessEqual.getRight());
         	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '<=' só pode comparar valores do mesmo tipo.");
+        		errorMessageSemantico(exp, "Operação '<=' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
         	}
         	return Tipagem.ANSWER;
         }
@@ -410,7 +410,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	Tipagem operadorEsquerda = infereTipoExp(expGreater.getLeft());
         	Tipagem operadorDireita = infereTipoExp(expGreater.getRight());
         	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '>' só pode comparar valores do mesmo tipo.");
+        		errorMessageSemantico(exp, "Operação '>' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
         	}
         	return Tipagem.ANSWER;
         }
@@ -419,7 +419,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	Tipagem operadorEsquerda = infereTipoExp(expGreaterEqual.getLeft());
         	Tipagem operadorDireita = infereTipoExp(expGreaterEqual.getRight());
         	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '>=' só pode comparar valores do mesmo tipo.");
+        		errorMessageSemantico(exp, "Operação '>=' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
         	}
         	return Tipagem.ANSWER;
         }
@@ -428,16 +428,16 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         	AMinusExpExp expMinusExp = (AMinusExpExp) exp;
         	Tipagem operadorEsquerda = infereTipoExp(expMinusExp.getExp());
         	if(operadorEsquerda != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '-' só pode ser usado em valores do tipo NUMBER");
+        		errorMessageSemantico(exp, "Operação '-' exige NUMBER, mas encontrou " + operadorEsquerda);
         	}
-        	return Tipagem.ANSWER;
+        	return Tipagem.NUMBER;
         }
         return null;
     }
     
     // === Mensagens de erro ===
     private void errorMessageSemantico(Node node, String mensagem) {
-        throw new SemanticoError("Erro semântico: " + node + ": " + mensagem);
+        throw new SemanticoError("Erro semântico: "+ mensagem);
     }
 
 
