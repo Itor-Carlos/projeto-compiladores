@@ -12,7 +12,7 @@ import prolixa.parser.Parser;
 public class Main {
 	public static void main (String[] args) {
         try {
-        	String arquivo = "src/teste.sable";
+        	String arquivo = "src/codigo_sable.sable";
         	  	
         	Parser p =
         		    new Parser(

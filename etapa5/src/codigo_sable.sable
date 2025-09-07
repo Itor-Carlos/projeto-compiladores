@@ -1,0 +1,12 @@
+This is program Test.
+
+It presents:
+    unalterable answer A;
+    alterable answer B;
+    alterable answer C;
+	vector of answer(5) S;	
+
+Let us begin:
+    B := no;
+    capture(D);
+That would be all.

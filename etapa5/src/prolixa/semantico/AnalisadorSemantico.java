@@ -24,7 +24,6 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         System.out.println("-------------------------------------------------");
     }
 
-    // === Escopos ===
     @Override
     public void inABlocoComando(ABlocoComando node) {
         tabela.push();
@@ -34,15 +33,12 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void outABlocoComando(ABlocoComando node) {
         tabela.pop();
     }
-
-    // === Declarações ===
+    
     @Override
     public void outAVariavelDeclaracao(AVariavelDeclaracao node) {
         String nome = node.getIdentificador().getText();
         Tipagem tipo = traduzTipo(node.getTipo());
-        
-        //System.out.println(nome.toString());
-
+       
         if (tabela.searchLocal(nome) != null) {
             errorMessageSemantico(node, "Identificador " + nome + " já declarado.");
         } 
@@ -68,8 +64,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
                 Simbolo simbolo = new Simbolo(nome, tipo, TipoSimbolo.CONSTANTE, false, true, 0, node.getValor());
                 tabela.add(nome, simbolo);
             } else {
-                Simbolo simbolo = new Simbolo(
-                    nome, tipo, TipoSimbolo.CONSTANTE, false, false, 0, null);
+                Simbolo simbolo = new Simbolo(nome, tipo, TipoSimbolo.CONSTANTE, false, false, 0, null);
                 tabela.add(nome, simbolo);
             }
         }
@@ -82,65 +77,121 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
 
         if (tabela.searchLocal(nome) != null) {
             errorMessageSemantico(node, "Vetor " + nome + " já declarado.");
-        } else {
-            // valida dimensões > 0
-            for (PExp exp : node.getDimensoes()) {
-                Tipagem tipagem = infereTipoExp(exp);
+        } 
+        else {
+            int qtdDimensoes = node.getDimensoes().size();
+            
+            for (PExp expression : node.getDimensoes()) {
+                Tipagem tipagem = infereTipoExp(expression);
                 if (tipagem != Tipagem.NUMBER) {
                     errorMessageSemantico(node, "Dimensão do vetor deve ser number.");
                 }
             }
-            Simbolo simbolo = new Simbolo(
-                nome, tipo, TipoSimbolo.VETOR, true, false, 0, null);
+            Simbolo simbolo = new Simbolo(nome, tipo, TipoSimbolo.VETOR, true, false, qtdDimensoes, null);
             tabela.add(nome, simbolo);
         }
     }
 
-    // === Uso de variáveis ===
     @Override
     public void outAVarExp(AVarExp node) {
-        String nome = node.getVar().toString().trim();
-        Simbolo simbolo = tabela.search(nome);
-       
-        //System.out.println(node.getVar());
-        //System.out.println("aahdasuihdasd");
-        
-        if (simbolo == null) {
-            errorMessageSemantico(node, "Variável " + nome + " não declarada.");
-        } else if (!simbolo.isInicializada()) {
-            errorMessageSemantico(node, "Variável " + nome + " usada sem inicialização.");
+        PVar variaveis = node.getVar();
+        String nome;
+        Simbolo simbolo;
+        if (variaveis instanceof AIdentificadorVar) {
+            nome = ((AIdentificadorVar) variaveis).getIdentificador().getText();
+            simbolo = tabela.search(nome);
+
+            if (simbolo == null) {
+                errorMessageSemantico(node, "Variável " + nome + " não declarada.");
+            } 
+            else if (!simbolo.isInicializada()) {
+                errorMessageSemantico(node, "Variável " + nome + " usada sem inicialização.");
+            }
+        } 
+        else if (variaveis instanceof AIdentificadorVetorVar) {
+            AIdentificadorVetorVar varVetor = (AIdentificadorVetorVar) variaveis;
+            nome = varVetor.getIdentificador().getText();
+            simbolo = tabela.search(nome);
+
+            if (simbolo == null) {
+                errorMessageSemantico(node, "Vetor " + nome + " não declarado.");
+                return;
+            }
+            if (simbolo.getTipoSimbolo() != TipoSimbolo.VETOR) {
+                errorMessageSemantico(node, nome + " não é um vetor.");
+                return;
+            }
+
+            int qtdIndices = varVetor.getIndices().size();
+            if (qtdIndices != simbolo.getDimensoes()) {
+                errorMessageSemantico(node, "Número de índices incompatível para vetor " + nome);
+            }
+
+            for (PExp indices : varVetor.getIndices()) {
+                if (infereTipoExp(indices) != Tipagem.NUMBER) {
+                    errorMessageSemantico(node, "Índice de vetor deve ser do tipo number.");
+                }
+            }
         }
     }
 
-    // === Atribuições ===
+    
     @Override
     public void outAAtribuicaoVarComando(AAtribuicaoVarComando node) {
-        String nome = node.getVar().toString().trim();
-        Simbolo simbolo = tabela.search(nome);
-        
-        //System.out.println(node);       
-        
-        if (simbolo == null) {
-            errorMessageSemantico(node, "Variável " + nome + " não declarada.");
-        } else if (!simbolo.isAlterable()) {
-            errorMessageSemantico(node, "Não é permitido atribuir valor à constante " + nome + ".");
-        } else {
-            Tipagem tipoExp = infereTipoExp(node.getExp());
-            if (tipoExp != null && simbolo.getTipo() != tipoExp) {
-                errorMessageSemantico(
-                    node,
-                    "Tipo incompatível: esperado " + simbolo.getTipo() +
-                    " mas encontrado " + tipoExp
-                );
+        PVar variavel = node.getVar();
+        String nome;
+        Simbolo simbolo;
+
+        if (variavel instanceof AIdentificadorVar) {
+            nome = ((AIdentificadorVar) variavel).getIdentificador().getText();
+            simbolo = tabela.search(nome);
+
+            if (simbolo == null) {
+                errorMessageSemantico(node, "Variável " + nome + " não declarada.");
+            } 
+            else if (!simbolo.isAlterable()) {
+                errorMessageSemantico(node, "Não é permitido atribuir valor à constante " + nome + ".");
+            } 
+            else {
+                Tipagem tipoExp = infereTipoExp(node.getExp());
+                if (tipoExp != null && simbolo.getTipo() != tipoExp) {
+                    errorMessageSemantico(node, "Tipo incompatível: esperado " + simbolo.getTipo() + " mas encontrado " + tipoExp);
+                }
+                simbolo.setInicializada(true);
+            }
+        } 
+        else if (variavel instanceof AIdentificadorVetorVar) {
+            AIdentificadorVetorVar varVetor = (AIdentificadorVetorVar) variavel;
+            nome = varVetor.getIdentificador().getText();
+            simbolo = tabela.search(nome);
+
+            if (simbolo == null) {
+                errorMessageSemantico(node, "Vetor " + nome + " não declarado.");
+                return;
+            }
+            if (simbolo.getTipoSimbolo() != TipoSimbolo.VETOR) {
+                errorMessageSemantico(node, nome + " não é um vetor.");
+                return;
+            }
+
+            int quantidadeIndices = varVetor.getIndices().size();
+            if (quantidadeIndices != simbolo.getDimensoes()) {
+                errorMessageSemantico(node, "Número de índices incompatível para vetor " + nome);
+            }
+            for (PExp idx : varVetor.getIndices()) {
+                if (infereTipoExp(idx) != Tipagem.NUMBER) {
+                    errorMessageSemantico(node, "Índice de vetor deve ser do tipo number.");
+                }
+            }
+
+            Tipagem tipoExpression = infereTipoExp(node.getExp());
+            if (tipoExpression != null && simbolo.getTipo() != tipoExpression) {
+                errorMessageSemantico(node, "Tipo incompatível: vetor " + nome +" é " + simbolo.getTipo() + " mas recebeu " + tipoExpression);
             }
             simbolo.setInicializada(true);
         }
     }
-    
-    @Override
-    public void inAPlusExp(APlusExp node){
-        //System.out.println(node);
-    }
+
 
     @Override
     public void inAAtribuicaoConstComando(AAtribuicaoConstComando node) {
@@ -149,18 +200,17 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
 
         if (simbolo == null) {
             errorMessageSemantico(node, "Constante " + nome + " não declarada.");
-        } else if (simbolo.getTipoSimbolo() != TipoSimbolo.CONSTANTE) {
+        } 
+        else if (simbolo.getTipoSimbolo() != TipoSimbolo.CONSTANTE) {
             errorMessageSemantico(node, nome + " não é constante.");
-        } else if (simbolo.isInicializada()) {
+        } 
+        else if (simbolo.isInicializada()) {
             errorMessageSemantico(node, "Constante " + nome + " já foi inicializada.");
-        } else {
-            Tipagem tipoExp = infereTipoExp(node.getExp());
-            if (tipoExp != null && simbolo.getTipo() != tipoExp) {
-                errorMessageSemantico(
-                    node,
-                    "Tipo incompatível: esperado " + simbolo.getTipo() +
-                    " mas encontrado " + tipoExp
-                );
+        } 
+        else {
+            Tipagem tipoExpression = infereTipoExp(node.getExp());
+            if (tipoExpression != null && simbolo.getTipo() != tipoExpression) {
+                errorMessageSemantico(node, "Tipo incompatível: esperado " + simbolo.getTipo() +" mas encontrado " + tipoExpression);
             }
             simbolo.setInicializada(true);
         }
@@ -180,16 +230,16 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     
     @Override
     public void outAJustInCaseComando(AJustInCaseComando node) {
-        Tipagem cond = infereTipoExp(node.getCondicao());
-        if (cond != Tipagem.ANSWER) {
+        Tipagem condicional = infereTipoExp(node.getCondicao());
+        if (condicional != Tipagem.ANSWER) {
             errorMessageSemantico(node, "Condição do 'just in case' deve ser do tipo answer (yes/no).");
         }
     }
 
     @Override
     public void outAAslongasComando(AAslongasComando node) {
-        Tipagem cond = infereTipoExp(node.getCondicao());
-        if (cond != Tipagem.ANSWER) {
+        Tipagem condicional = infereTipoExp(node.getCondicao());
+        if (condicional != Tipagem.ANSWER) {
             errorMessageSemantico(node, "Condição do 'as long as' deve ser do tipo answer (yes/no).");
         }
     }
@@ -212,58 +262,99 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
         Tipagem incremento = infereTipoExp(node.getIncremento());
                 
         if (inicio != Tipagem.NUMBER && inicio != Tipagem.SYMBOL) {
-            errorMessageSemantico(node, "Expressão inicial de 'considering' deve ser number ou symbol.");
+            errorMessageSemantico(node, "Expressão inicial do comando 'considering' deve ser number ou symbol.");
         }
         if (fim != Tipagem.NUMBER && fim != Tipagem.SYMBOL) {
-            errorMessageSemantico(node, "Expressão final de 'considering' deve ser number ou symbol.");
+            errorMessageSemantico(node, "Expressão final do comando 'considering' deve ser number ou symbol.");
         }
         if (incremento != Tipagem.NUMBER && incremento != Tipagem.SYMBOL) {
-            errorMessageSemantico(node, "Incremento de 'considering' deve ser number ou symbol.");
+            errorMessageSemantico(node, "Incremento do comando 'considering' deve ser number ou symbol.");
         }
         
         simbolo.setInicializada(true);
     }
 
-    // === Procedimentos Primitivos ===
     @Override
     public void outACaptureComando(ACaptureComando node) {
-        for (PVar v : node.getVariaveis()) {
-            String nome = v.toString().trim();
-            Simbolo simbolo = tabela.search(nome);
-            if (simbolo == null) {
-                errorMessageSemantico(node, "Variável " + nome + " não declarada.");
-            } else if (!simbolo.isAlterable()) {
-                errorMessageSemantico(node, "Não é possível capturar valor em constante " + nome);
+        for (PVar variaveis : node.getVariaveis()) {
+            String nome;
+            Simbolo simbolo;
+            if (variaveis instanceof AIdentificadorVar) {
+                nome = ((AIdentificadorVar) variaveis).getIdentificador().getText();
+                simbolo = tabela.search(nome);
+
+
+                if (simbolo == null) {
+                    errorMessageSemantico(node, "Variável ou Constante " + nome + " não declarada.");
+                } 
+                
+                else if(simbolo.getTipoSimbolo() == TipoSimbolo.VARIAVEL) {
+                	System.out.println("Capture de Variável com as seguintes informações -> : " + "Nome: " + nome + " | Tipo: " + (simbolo != null ? simbolo.getTipo() : "não declarada"));
+                	simbolo.setInicializada(true);
+                }
+                else if(simbolo.getTipoSimbolo() == TipoSimbolo.CONSTANTE) {
+                	if (!simbolo.isAlterable() && simbolo.isInicializada() == true) {
+                        errorMessageSemantico(node, "Não é possível capturar valor em constante " + nome);
+                    }
+                	System.out.println("Capture de Constante com as seguintes informações -> : " + "Nome: " + nome + " | Tipo: " + (simbolo != null ? simbolo.getTipo() : "não declarada"));
+                	simbolo.setInicializada(true);
+                }
+            } 
+            else if (variaveis instanceof AIdentificadorVetorVar) {
+                AIdentificadorVetorVar varVetor = (AIdentificadorVetorVar) variaveis;
+                nome = varVetor.getIdentificador().getText();
+                simbolo = tabela.search(nome);
+
+                System.out.println("Capture em um Vetor com as seguintes informações: Vetor -> " + "Nome: "  + nome + " | Tipagem: " + (simbolo != null ? simbolo.getTipo() : "não declarado") + " | Dimensões: " + (simbolo != null ? simbolo.getDimensoes() : "?") + " | Dimensões usadas: " + varVetor.getIndices().size());
+
+                if (simbolo == null) {
+                    errorMessageSemantico(node, "Vetor " + nome + " não declarado.");
+                    continue;
+                }
+                if (simbolo.getTipoSimbolo() != TipoSimbolo.VETOR) {
+                    errorMessageSemantico(node, nome + " não é um vetor.");
+                    continue;
+                }
+
+                int qtdIndices = varVetor.getIndices().size();
+                if (qtdIndices != simbolo.getDimensoes()) {
+                    errorMessageSemantico(node, "Número de índices incompatível para vetor " + nome);
+                }
+                for (PExp idx : varVetor.getIndices()) {
+                    if (infereTipoExp(idx) != Tipagem.NUMBER) {
+                        errorMessageSemantico(node, "Índice de vetor deve ser do tipo number.");
+                    }
+                }
+                simbolo.setInicializada(true);
             }
         }
     }
+
+
 
     @Override
     public void outAShowComando(AShowComando node) {
-        for (PExp exp : node.getExpressoes()) {
-            Tipagem tipoExp = infereTipoExp(exp);
-            
-            System.out.println(exp);
-            System.out.println(tipoExp);
+        for (PExp expression : node.getExpressoes()) {
+            Tipagem tipoExpression = infereTipoExp(expression);
 
-            if (tipoExp == null) {
-                errorMessageSemantico(node, "Expressão em 'show' inválida");
+            System.out.println("Expressão em 'show': " + expression + " | Tipo: " + tipoExpression);
+
+            if (tipoExpression == null) {
+                errorMessageSemantico(node, "Expressão em 'show' inválida: " + expression);
             }
         }
     }
 
-    // === Comandos de interrupção ===
     @Override
     public void outAAbandonComando(AAbandonComando node) {
-        
+    	System.out.println("Comando 'abandon' encontrado dentro de um laço: finalização de laço.");
     }
 
     @Override
     public void outAGotonextComando(AGotonextComando node) {
-
+    	System.out.println("Comando 'go to next iteration' encontrado: avança para a próxima iteração do laço em questão");
     }
-
-    // === Auxiliares ===
+    
     private Tipagem traduzTipo(Node tipo) {
         if (tipo instanceof ANumberTipo) return Tipagem.NUMBER;
         if (tipo instanceof AAnswerTipo) return Tipagem.ANSWER;
@@ -275,171 +366,252 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     	if (exp instanceof ANumeroExp) return Tipagem.NUMBER;
         if (exp instanceof ABoolExp) return Tipagem.ANSWER;
         if (exp instanceof ACharExp) return Tipagem.SYMBOL;
-        if (exp instanceof AStringExp) return Tipagem.SYMBOL;
-        
-        if (exp instanceof AVarExp) {
-            String nome = ((AVarExp) exp).getVar().toString().trim();
-            Simbolo s = tabela.search(nome);
-            return (s != null) ? s.getTipo() : null;
+        if (exp instanceof AStringExp) {
+        	return Tipagem.SYMBOL;
         }
-        //Operações numéricas
+          
         if (exp instanceof APlusExp) {
-        	//System.out.println("aqui");
-            APlusExp e = (APlusExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
-            Tipagem operadorDireita = infereTipoExp(e.getRight());
-            if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-            	errorMessageSemantico(exp, "Operador '+' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.NUMBER;
         }
         if (exp instanceof AMinusExp) {
-            AMinusExp e = (AMinusExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
-            Tipagem operadorDireita = infereTipoExp(e.getRight());
-            if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-            	errorMessageSemantico(exp, "Operador '-' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.NUMBER;
         }
         
         if (exp instanceof ATimesExp) {
-        	ATimesExp expTimes = (ATimesExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(expTimes.getLeft());
-            Tipagem operadorDireita = infereTipoExp(expTimes.getRight());
-            if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-            	errorMessageSemantico(exp, "Operador '*' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.NUMBER;
         }
        
-      //Não permitir divisão por zero: 
         if(exp instanceof ADivideExp) {
-        	ADivideExp expDivide = (ADivideExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expDivide.getLeft());
-        	Tipagem operadorDireita = infereTipoExp(expDivide.getRight());
-        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '/' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-        	}
         	return Tipagem.NUMBER;
         }
         if(exp instanceof AIntDivideExp) {
-        	AIntDivideExp expIntDivide = (AIntDivideExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expIntDivide.getLeft());
-        	Tipagem operadorDireita = infereTipoExp(expIntDivide.getRight());
-        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operador '//' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-        	}
         	return Tipagem.NUMBER;
         }
         
-        
-        //Operações booleanas
         if (exp instanceof AAndExp) {
-            AAndExp e = (AAndExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
-            Tipagem operadorDireita = infereTipoExp(e.getRight());
-            if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
-            	errorMessageSemantico(exp, "Operação 'and' exige ANSWER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.ANSWER;
         }
         if (exp instanceof AEqualExp) {
-            AEqualExp e = (AEqualExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(e.getLeft());
-            Tipagem operadorDireita = infereTipoExp(e.getRight());
-            if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
-            	errorMessageSemantico(exp, "Operação '==' exige tipos iguais, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.ANSWER;
         }
         if (exp instanceof AOrExp) {
-        	AOrExp expOr = (AOrExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(expOr.getLeft());
-            Tipagem operadorDireita = infereTipoExp(expOr.getRight());
-            if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
-            	errorMessageSemantico(exp, "Operação 'or' exige ANSWER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.ANSWER;
         }
         if (exp instanceof ANotExp) {
-        	ANotExp expOr = (ANotExp) exp;
-            Tipagem operadorUnitario = infereTipoExp(expOr.getExp());
-            if (operadorUnitario != Tipagem.ANSWER) {
-                errorMessageSemantico(exp, "Operação 'not' exige ANSWER, mas encontrou " + operadorUnitario);
-                return null;
-            }
             return Tipagem.ANSWER;
         }
         if (exp instanceof ANotEqualExp) {
-        	ANotEqualExp expNotEqual = (ANotEqualExp) exp;
-            Tipagem operadorEsquerda = infereTipoExp(expNotEqual.getLeft());
-            Tipagem operadorDireita = infereTipoExp(expNotEqual.getRight());
-            if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
-                errorMessageSemantico(exp, "Operador '!=' exige tipos iguais, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-                return null;
-            }
             return Tipagem.ANSWER;
         }
         if(exp instanceof ALessExp) {
-        	ALessExp expLess = (ALessExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expLess.getLeft());
-        	Tipagem operadorDireita = infereTipoExp(expLess.getRight());
-        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operação '<' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-        	}
         	return Tipagem.ANSWER;
         }
         if(exp instanceof ALessEqualExp) {
-        	ALessEqualExp expLessEqual = (ALessEqualExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expLessEqual.getLeft());
-        	Tipagem operadorDireita = infereTipoExp(expLessEqual.getRight());
-        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operação '<=' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-        	}
         	return Tipagem.ANSWER;
         }
         if(exp instanceof AGreaterExp) {
-        	AGreaterExp expGreater = (AGreaterExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expGreater.getLeft());
-        	Tipagem operadorDireita = infereTipoExp(expGreater.getRight());
-        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operação '>' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-        	}
         	return Tipagem.ANSWER;
         }
         if(exp instanceof AGreaterEqualExp) {
-        	AGreaterEqualExp expGreaterEqual = (AGreaterEqualExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expGreaterEqual.getLeft());
-        	Tipagem operadorDireita = infereTipoExp(expGreaterEqual.getRight());
-        	if(operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operação '>=' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
-        	}
         	return Tipagem.ANSWER;
         }
         
         if(exp instanceof AMinusExpExp) {
-        	AMinusExpExp expMinusExp = (AMinusExpExp) exp;
-        	Tipagem operadorEsquerda = infereTipoExp(expMinusExp.getExp());
-        	if(operadorEsquerda != Tipagem.NUMBER) {
-        		errorMessageSemantico(exp, "Operação '-' exige NUMBER, mas encontrou " + operadorEsquerda);
-        	}
         	return Tipagem.NUMBER;
         }
+        
+        if (exp instanceof AVarExp) {
+            PVar variavelExpression = ((AVarExp) exp).getVar();
+
+            if (variavelExpression instanceof AIdentificadorVar) {
+                String nome = ((AIdentificadorVar) variavelExpression).getIdentificador().getText();
+                Simbolo simbolo = tabela.search(nome);
+                if (simbolo == null) {
+                    errorMessageSemantico(exp, "Variável " + nome + " não declarada.");
+                    return null;
+                }
+                return simbolo.getTipo();
+            }
+            else if (variavelExpression instanceof AIdentificadorVetorVar) {
+                AIdentificadorVetorVar varVetor = (AIdentificadorVetorVar) variavelExpression;
+                String nome = varVetor.getIdentificador().getText();
+                Simbolo simbolo = tabela.search(nome);
+
+                if (simbolo == null) {
+                    errorMessageSemantico(exp, "Vetor " + nome + " não declarado.");
+                    return null;
+                }
+                if (simbolo.getTipoSimbolo() != TipoSimbolo.VETOR) {
+                    errorMessageSemantico(exp, nome + " não é um vetor.");
+                    return null;
+                }
+
+                int quantidadeIndices = varVetor.getIndices().size();
+                if (quantidadeIndices != simbolo.getDimensoes()) {
+                    errorMessageSemantico(exp, "Número de índices incompatível para vetor " + nome);
+                }
+
+                for (PExp indice : varVetor.getIndices()) {
+                    Tipagem tipoIndice = infereTipoExp(indice);
+                    if (tipoIndice != Tipagem.NUMBER) {
+                        errorMessageSemantico(exp, "Índice de vetor deve ser do tipo number.");
+                    }
+                }
+
+                return simbolo.getTipo();
+            }
+        }
+
         return null;
     }
     
-    // === Mensagens de erro ===
-    private void errorMessageSemantico(Node node, String mensagem) {
-        throw new SemanticoError("Erro semântico: "+ mensagem);
+    @Override
+    public void outAPlusExp(APlusExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        	errorMessageSemantico(node, "Operador '+' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outAMinusExp(AMinusExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        	errorMessageSemantico(node, "Operador '-' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outATimesExp(ATimesExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+        	errorMessageSemantico(node, "Operador '*' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outADivideExp(ADivideExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador '/' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outAIntDivideExp(AIntDivideExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador '//' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
     }
 
+    @Override
+    public void outALessExp(ALessExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador '<' exige NUMBER, mas encontrou "  + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outALessEqualExp(ALessEqualExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador '<=' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outAGreaterExp(AGreaterExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador '>' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outAGreaterEqualExp(AGreaterEqualExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.NUMBER || operadorDireita != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador '>=' exige NUMBER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outAMinusExpExp(AMinusExpExp node){
+        Tipagem operador = infereTipoExp(node.getExp());
+        if (operador != Tipagem.NUMBER) {
+            errorMessageSemantico(node, "Operador unário '-' exige NUMBER, mas encontrou " + operador);
+        }
+    }
+    
+    @Override
+    public void outAOrExp(AOrExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
+            errorMessageSemantico(node, "Operador 'or' exige ANSWER, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outANotExp(ANotExp node){
+        Tipagem operadorUnitario = infereTipoExp(node.getExp());
+        if (operadorUnitario != Tipagem.ANSWER) {
+            errorMessageSemantico(node, "Operador 'not' exige ANSWER, mas encontrou " + operadorUnitario);
+        }
+    }
+
+    
+    @Override
+    public void outAAndExp(AAndExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
+            errorMessageSemantico(node, "Operador 'and' exige ANSWER, mas encontrou "  + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+
+    @Override
+    public void outAEqualExp(AEqualExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
+            errorMessageSemantico(node, "Operador '==' exige tipos iguais, mas encontrou "  + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outANotEqualExp(ANotEqualExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda == null || operadorDireita == null || operadorEsquerda != operadorDireita) {
+            errorMessageSemantico(node, "Operador '!=' exige tipos iguais, mas encontrou " + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+    
+    @Override
+    public void outAXorExp(AXorExp node){
+        Tipagem operadorEsquerda = infereTipoExp(node.getLeft());
+        Tipagem operadorDireita = infereTipoExp(node.getRight());
+        if (operadorEsquerda != Tipagem.ANSWER || operadorDireita != Tipagem.ANSWER) {
+            errorMessageSemantico(node, "Operador 'xor' exige ANSWER, mas encontrou "
+                + operadorEsquerda + " e " + operadorDireita);
+        }
+    }
+
+    private void errorMessageSemantico(Node node, String mensagem) {
+        throw new SemanticoError(mensagem);
+    }
 
     @Override
     public String toString() {
