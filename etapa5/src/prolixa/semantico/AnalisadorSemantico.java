@@ -15,6 +15,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     public void inStart(Start node) {
         System.out.println("-------------------------------------------------");
         System.out.println("Iniciando análise semântica...");
+        System.out.println("-------------------------------------------------");
     }
 
     @Override
@@ -178,8 +179,8 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
             if (quantidadeIndices != simbolo.getDimensoes()) {
                 errorMessageSemantico(node, "Número de índices incompatível para vetor " + nome);
             }
-            for (PExp idx : varVetor.getIndices()) {
-                if (infereTipoExp(idx) != Tipagem.NUMBER) {
+            for (PExp indice : varVetor.getIndices()) {
+                if (infereTipoExp(indice) != Tipagem.NUMBER) {
                     errorMessageSemantico(node, "Índice de vetor deve ser do tipo number.");
                 }
             }
@@ -320,8 +321,8 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
                 if (qtdIndices != simbolo.getDimensoes()) {
                     errorMessageSemantico(node, "Número de índices incompatível para vetor " + nome);
                 }
-                for (PExp idx : varVetor.getIndices()) {
-                    if (infereTipoExp(idx) != Tipagem.NUMBER) {
+                for (PExp indice : varVetor.getIndices()) {
+                    if (infereTipoExp(indice) != Tipagem.NUMBER) {
                         errorMessageSemantico(node, "Índice de vetor deve ser do tipo number.");
                     }
                 }
@@ -610,7 +611,7 @@ public class AnalisadorSemantico extends DepthFirstAdapter {
     }
 
     private void errorMessageSemantico(Node node, String mensagem) {
-        throw new SemanticoError(mensagem);
+        System.err.println(mensagem);
     }
 
     @Override

@@ -8,5 +8,5 @@ It presents:
 
 Let us begin:
     B := no;
-    capture(D);
+    show(B);
 That would be all.

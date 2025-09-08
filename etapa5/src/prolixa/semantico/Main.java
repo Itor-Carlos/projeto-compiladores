@@ -12,7 +12,7 @@ import prolixa.parser.Parser;
 public class Main {
 	public static void main (String[] args) {
         try {
-        	String arquivo = "src/codigo_sable.sable";
+        	String arquivo = "src/codigo_teste.prlx";
         	  	
         	Parser p =
         		    new Parser(
@@ -21,9 +21,7 @@ public class Main {
         		    new FileReader(arquivo), 1024))); 
         		   
         		   Start tree = p.parse();
-
-        		   tree.apply(new ASTDisplay());
-        		   
+ 
         		   //aplicação da análise semântica em minha AST
         		   tree.apply(new AnalisadorSemantico());
         }
